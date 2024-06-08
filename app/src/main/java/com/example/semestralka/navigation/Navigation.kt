@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.semestralka.gui.addrecipe.AddRecipeDestination
+import com.example.semestralka.gui.addrecipe.AddRecipeScreen
 import com.example.semestralka.gui.mainscreen.NotesDestination
 
 import com.example.semestralka.gui.mainscreen.NotesScreen
@@ -37,7 +39,9 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier){
         }
         composable(route = NotesDestination.route) {
             NotesScreen(onNext = {navController.navigate(MainDestination.route)})
-
+        }
+        composable(route = AddRecipeDestination.route) {
+            AddRecipeScreen(navController)
         }
     }
 }

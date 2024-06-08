@@ -50,7 +50,24 @@ fun RecipeScreen(onRecipeClick: (Recipe) -> Unit) {
             .padding(16.dp)
     ) {
         SearchBar()
-        Spacer(modifier = Modifier.height(16.dp))
+
+        val modifier = Modifier.size(70.dp)
+
+        Row {
+            IconButton(onClick = { /* Handle filter action */},modifier = modifier ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_filter),
+                    contentDescription = "Filter",
+                )
+
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { /* Handle add action */ },modifier = modifier) {
+                Image(painter = painterResource(id = R.drawable.ic_add_recipe), contentDescription = "Add")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -83,12 +100,7 @@ fun SearchBar() {
                 unfocusedIndicatorColor = Color.Transparent
             )
         )
-        IconButton(onClick = { /* Handle filter action */ }) {
-            Icon(painter = painterResource(id = R.drawable.food), contentDescription = "Filter")
-        }
-        IconButton(onClick = { /* Handle add action */ }) {
-            Icon(painter = painterResource(id = R.drawable.food), contentDescription = "Add")
-        }
+
     }
 }
 
