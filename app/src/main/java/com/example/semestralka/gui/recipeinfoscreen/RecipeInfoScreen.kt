@@ -68,7 +68,7 @@ fun RecipeInfoScreen(onBack: () -> Unit, onEdit: () -> Unit) {
                     Text(text = "8 servings")
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(painter = painterResource(id = R.drawable.ic_dinner), contentDescription = "Dinner")
+                    Icon(painter = painterResource(id = R.drawable.ic_meal), contentDescription = "Dinner")
                     Text(text = "dinner")
                 }
             }

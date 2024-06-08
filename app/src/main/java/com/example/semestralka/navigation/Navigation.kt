@@ -11,8 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.semestralka.gui.notesscreen.NotesDestination
-import com.example.semestralka.gui.notesscreen.NotesScreen
+import com.example.semestralka.gui.mainscreen.NotesDestination
+
+import com.example.semestralka.gui.mainscreen.NotesScreen
 
 
 @Composable
@@ -35,7 +36,7 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier){
             }
         }
         composable(route = NotesDestination.route) {
-            NotesScreen()
+            NotesScreen(onNext = {navController.navigate(MainDestination.route)})
 
         }
     }

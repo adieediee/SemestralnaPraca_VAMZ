@@ -144,7 +144,7 @@ fun ShoppingListCard() {
             .height(293.dp)
     ) {
         LazyColumn(
-            modifier = Modifier.padding(4.dp)
+            modifier = Modifier.padding(10.dp)
         ) {
             item {
                 Text(
@@ -191,7 +191,7 @@ fun CookDoListCard() {
             .padding(4.dp)
     ) {
         LazyColumn(
-            modifier = Modifier.padding(4.dp)
+            modifier = Modifier.padding(10.dp)
         ) {
             item {
                 Text(
