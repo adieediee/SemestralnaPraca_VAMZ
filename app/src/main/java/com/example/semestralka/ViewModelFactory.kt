@@ -18,6 +18,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
             modelClass.isAssignableFrom(RecipeListViewModel::class.java) -> {
                 RecipeListViewModel(recipeRepository) as T
             }
+
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }

@@ -11,6 +11,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,18 +26,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 
 import com.example.semestralka.R
 
 
 import com.example.semestralka.navigation.NavigationDestination
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 object MainDestination : NavigationDestination {
     override val route = "main"
 }
 
 @Composable
-fun MainScreen(onPrevious: () -> Unit, onNext: () -> Unit) {
+fun MainScreen(onPrevious: () -> Unit, onNext: () -> Unit, viewModel: ShoppingListViewModel) {
     Scaffold(bottomBar = {
         BottomAppBar(
             modifier = Modifier.height(60.dp),
@@ -43,7 +51,6 @@ fun MainScreen(onPrevious: () -> Unit, onNext: () -> Unit) {
                 painter = painterResource(id = R.drawable.ic_back), // Replace with your edit image resource
                 contentDescription = "Previous",
                 modifier = Modifier
-
                     .padding(8.dp)
                     .size(48.dp)
                     .clip(CircleShape)
@@ -54,7 +61,6 @@ fun MainScreen(onPrevious: () -> Unit, onNext: () -> Unit) {
                 painter = painterResource(id = R.drawable.ic_forward), // Replace with your edit image resource
                 contentDescription = "Next",
                 modifier = Modifier
-
                     .padding(8.dp)
                     .size(48.dp)
                     .clip(CircleShape)
@@ -83,9 +89,8 @@ fun MainScreen(onPrevious: () -> Unit, onNext: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             MealCard()
             Spacer(modifier = Modifier.height(16.dp))
-            ListsRow()
+            ListsRow(viewModel)
             Spacer(modifier = Modifier.height(16.dp))
-
         }
     }
 }
@@ -120,23 +125,20 @@ fun MealCard() {
 }
 
 @Composable
-fun ListsRow() {
+fun ListsRow(viewModel: ShoppingListViewModel) {
     Row(
         modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        ShoppingListCard()
-        CookDoListCard()
+        ShoppingListCard(viewModel)
+        CookDoListCard(viewModel)
     }
 }
 
 @Composable
-fun ShoppingListCard() {
+fun ShoppingListCard(viewModel: ShoppingListViewModel) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp.dp / 2 - 24.dp
-
-    val items = listOf(
-        "90g prosciutto", "125g ball mozzarella", "750g minced beef", "200ml white sauce", "eggs"
-    )
+    val shoppingItems by viewModel.shoppingItems.collectAsState()
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -156,34 +158,29 @@ fun ShoppingListCard() {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = "today’s meal:")
             }
-            items(items) { item ->
-                CheckboxListItem(item)
+            items(shoppingItems) { item ->
+                CheckboxListItem(item.name, item.isChecked) {
+                    viewModel.onItemCheckedChange(item, it)
+                }
             }
             item {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = "other:")
                 CheckboxListItem("eggs")
                 Spacer(modifier = Modifier.height(8.dp))
-                AddItemButton(text = "add an item")
+                AddItemButton(text = "add an item") {
+                    viewModel.addItem(ShoppingItem("New Item"))
+                }
             }
         }
     }
 }
-
 @Composable
-fun CookDoListCard() {
+fun CookDoListCard(viewModel: ShoppingListViewModel) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp.dp / 2 - 24.dp
 
-    val cookDoItems = listOf(
-        "prep the veggies",
-        "restock spices",
-        "meal prep for the weekend",
-        "harvest some tomatoes",
-        "harvest some tomatoes",
-        "harvest some tomatoes",
-        "harvest some tomatoes"
-    )
+    val cookDoItems by viewModel.cookDoItems.collectAsState()
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -203,23 +200,28 @@ fun CookDoListCard() {
                 Spacer(modifier = Modifier.height(8.dp))
             }
             items(cookDoItems) { item ->
-                CheckboxListItem(item, checked = item == "harvest some tomatoes")
+                CheckboxListItem(item.name, item.isChecked) {
+                    viewModel.onCookDoItemCheckedChange(item, it)
+                }
             }
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                AddItemButton(text = "add a cook-do")
+                AddItemButton(text = "add a cook-do") {
+                    viewModel.addCookDoItem(ShoppingItem("New Cook-Do Item"))
+                }
             }
         }
     }
 }
 
+
 @Composable
-fun CheckboxListItem(text: String, checked: Boolean = false) {
+fun CheckboxListItem(text: String, checked: Boolean = false, onCheckedChange: (Boolean) -> Unit = {}) {
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)
     ) {
         Checkbox(
-            checked = checked, onCheckedChange = null // This can be implemented as per requirement
+            checked = checked, onCheckedChange = onCheckedChange
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = text)
@@ -227,8 +229,8 @@ fun CheckboxListItem(text: String, checked: Boolean = false) {
 }
 
 @Composable
-fun AddItemButton(text: String) {
-    TextButton(onClick = { /* Handle add item action */ }) {
+fun AddItemButton(text: String, onClick: () -> Unit = {}) {
+    TextButton(onClick = onClick) {
         Text(text = text)
     }
 }
@@ -249,5 +251,7 @@ fun ElevatedButtonExample(text: String, onRecipe: () -> Unit) {
         )
     }
 }
+
+
 
 

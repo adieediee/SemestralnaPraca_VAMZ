@@ -1,5 +1,6 @@
 package com.example.semestralka.gui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.semestralka.R
+import com.example.semestralka.SharedViewModel
 import com.example.semestralka.ViewModelFactory
 import com.example.semestralka.database.Recipe
 import com.example.semestralka.navigation.NavigationDestination
@@ -33,12 +35,18 @@ object RecipeDestination : NavigationDestination {
 
 @Composable
 fun RecipeScreen(
-    onRecipeClick: (Recipe) -> Unit,
+    onRecipeClick: () -> Unit,
     onPrevious: () -> Unit,
     onAdd: () -> Unit,
+    sharedViewModel: SharedViewModel,
     viewModel: RecipeListViewModel = viewModel(factory = ViewModelFactory)
 ) {
     val recipes by viewModel.allRecipes.collectAsState(initial = emptyList())
+
+    Log.d("RecipeScreen", "Loaded recipes: ${recipes.size}")
+    recipes.forEach { recipe ->
+        Log.d("RecipeScreen", "Recipe: ${recipe.name}, ID: ${recipe.id}")
+    }
 
     Scaffold(
         bottomBar = {
@@ -93,7 +101,10 @@ fun RecipeScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(recipes) { recipe ->
-                    RecipeCard(recipe, onClick = { onRecipeClick(recipe) })
+                    RecipeCard(recipe, onClick = {
+                        sharedViewModel.selectRecipe(recipe)
+                        onRecipeClick()
+                    })
                 }
             }
         }
