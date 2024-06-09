@@ -1,6 +1,5 @@
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
+package com.example.semestralka.gui
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,6 +10,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,59 +21,147 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.semestralka.R
+import com.example.semestralka.ViewModelFactory
+import com.example.semestralka.database.Recipe
 import com.example.semestralka.navigation.NavigationDestination
 
 object RecipeDestination : NavigationDestination {
     override val route = "recipes"
 }
-data class Recipe(
-    val title: String,
-    val type: String,
-    val time: String,
-    val servings: String,
-    val imageRes: Int
-)
 
 @Composable
-fun RecipeScreen(onRecipeClick: (Recipe) -> Unit) {
-    val recipes = listOf(
-        Recipe("Stuffed Peppers with cheese sauce", "dinner", "1h 30min", "4-6 servings", R.drawable.food),
-        Recipe("Easter cones as sweet nests", "dessert", "2h", "4-6 servings", R.drawable.food),
-        Recipe("One-Pan Cheesy Sausage Gnocchi", "dinner", "45min", "4 servings", R.drawable.food),
-        Recipe("Strawberry Mochi cakes", "dessert", "50min", "8 servings", R.drawable.food),
-        Recipe("Homemade Lasagna", "dinner", "2h", "8 servings", R.drawable.food)
-    )
+fun RecipeScreen(
+    onRecipeClick: (Recipe) -> Unit,
+    onPrevious: () -> Unit,
+    onAdd: () -> Unit,
+    viewModel: RecipeListViewModel = viewModel(factory = ViewModelFactory)
+) {
+    val recipes by viewModel.allRecipes.collectAsState(initial = emptyList())
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        SearchBar()
-
-        val modifier = Modifier.size(70.dp)
-
-        Row {
-            IconButton(onClick = { /* Handle filter action */},modifier = modifier ) {
+    Scaffold(
+        bottomBar = {
+            BottomAppBar(
+                modifier = Modifier
+                    .height(50.dp)
+                    .background(Color.Transparent),
+                containerColor = Color.Transparent,
+                contentColor = Color.Transparent
+            ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_filter),
-                    contentDescription = "Filter",
+                    painter = painterResource(id = R.drawable.ic_back),
+                    contentDescription = "Previous",
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .clickable(onClick = onPrevious)
                 )
-
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /* Handle add action */ },modifier = modifier) {
-                Image(painter = painterResource(id = R.drawable.ic_add_recipe), contentDescription = "Add")
             }
         }
-
-        Spacer(modifier = Modifier.height(4.dp))
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            items(recipes) { recipe ->
-                RecipeCard(recipe, onClick = { onRecipeClick(recipe) })
+            SearchBar()
+
+            val iconModifier = Modifier.size(60.dp)
+
+            Row(
+                modifier = Modifier.background(Color.Transparent),
+            ) {
+                Spacer(modifier = Modifier.width(10.dp))
+                IconButton(onClick = { /* Handle filter action */ }, modifier = iconModifier) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_filter),
+                        contentDescription = "Filter",
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = { onAdd() }, modifier = iconModifier) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_add_recipe),
+                        contentDescription = "Add",
+                    )
+                }
+            }
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(recipes) { recipe ->
+                    RecipeCard(recipe, onClick = { onRecipeClick(recipe) })
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
+    Row {
+        Spacer(modifier = Modifier.width(10.dp))
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+        ) {
+            Row(
+                modifier = Modifier.padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.food),
+                    contentDescription = recipe.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = recipe.name,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = recipe.type,
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_time),
+                            contentDescription = "Time",
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = recipe.time,
+                            fontSize = 14.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_servings),
+                            contentDescription = "Servings",
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = recipe.servings,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
             }
         }
     }
@@ -83,9 +172,7 @@ fun RecipeScreen(onRecipeClick: (Recipe) -> Unit) {
 fun SearchBar() {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.LightGray, RoundedCornerShape(16.dp))
-            .padding(8.dp),
+            .background(Color.LightGray, RoundedCornerShape(16.dp)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextField(
@@ -100,72 +187,5 @@ fun SearchBar() {
                 unfocusedIndicatorColor = Color.Transparent
             )
         )
-
     }
 }
-
-@Composable
-fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-    ) {
-        Row(
-            modifier = Modifier.padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = recipe.imageRes),
-                contentDescription = recipe.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = recipe.title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = recipe.type,
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.food),
-                        contentDescription = "Time",
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = recipe.time,
-                        fontSize = 14.sp
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.food),
-                        contentDescription = "Servings",
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = recipe.servings,
-                        fontSize = 14.sp
-                    )
-                }
-            }
-        }
-    }
-}
-
-

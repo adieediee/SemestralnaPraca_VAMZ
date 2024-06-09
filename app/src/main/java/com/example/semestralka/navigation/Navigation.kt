@@ -1,18 +1,24 @@
 package com.example.semestralka.navigation
 
+
+
+
 import MainDestination
 import MainScreen
-import RecipeDestination
+
 import RecipeInfoDestination
 import RecipeInfoScreen
-import RecipeScreen
+
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.semestralka.gui.addrecipe.AddRecipeDestination
-import com.example.semestralka.gui.addrecipe.AddRecipeScreen
+import com.example.semestralka.gui.AddRecipeDestination
+import com.example.semestralka.gui.AddRecipeScreen
+import com.example.semestralka.gui.RecipeDestination
+import com.example.semestralka.gui.RecipeScreen
+
 import com.example.semestralka.gui.mainscreen.NotesDestination
 
 import com.example.semestralka.gui.mainscreen.NotesScreen
@@ -31,7 +37,10 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier){
             )
         }
         composable(route = RecipeDestination.route) {
-            RecipeScreen({navController.navigate(RecipeInfoDestination.route)})
+            RecipeScreen(onRecipeClick = {navController.navigate(RecipeInfoDestination.route)},
+               onPrevious = {navController.navigate(MainDestination.route)},
+                onAdd = {navController.navigate(AddRecipeDestination.route)}
+            )
         }
         composable(route = RecipeInfoDestination.route) {
             RecipeInfoScreen(onBack = {navController.navigate(MainDestination.route)}) {
