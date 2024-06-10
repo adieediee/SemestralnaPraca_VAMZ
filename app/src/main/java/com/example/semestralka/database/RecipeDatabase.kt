@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Recipe::class], version = 5, exportSchema = false)
+@Database(entities = [Recipe::class], version = 7, exportSchema = false)
 abstract class RecipeDatabase : RoomDatabase() {
     abstract fun recipeDao(): RecipeDao
 
@@ -32,6 +32,7 @@ abstract class RecipeDatabase : RoomDatabase() {
                     .build()
                 INSTANCE = instance
                 Log.d("RecipeDatabase", "Database instance created")
+
                 instance
             }
         }
