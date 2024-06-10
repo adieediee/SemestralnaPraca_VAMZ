@@ -179,7 +179,6 @@ fun ShoppingListCard(viewModel: ShoppingListViewModel) {
 fun CookDoListCard(viewModel: ShoppingListViewModel) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp.dp / 2 - 24.dp
-
     val cookDoItems by viewModel.cookDoItems.collectAsState()
 
     Card(

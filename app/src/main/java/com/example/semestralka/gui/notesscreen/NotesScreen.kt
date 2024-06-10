@@ -4,6 +4,7 @@ import ShoppingItem
 import ShoppingListViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,7 +34,7 @@ object NotesDestination : NavigationDestination {
 @Composable
 fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(), onNext: () -> Unit) {
     val shoppingItems by viewModel.shoppingItems.collectAsState()
-    val cookDoItems = remember { mutableStateListOf("prep the veggies", "restock spices", "meal prep for the weekend", "harvest some tomatoes") }
+    val cookDoItems by viewModel.cookDoItems.collectAsState()
 
     Scaffold(
         topBar = {
@@ -47,7 +49,7 @@ fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(), onNext: () -> Un
             ) {
                 Spacer(modifier = Modifier.weight(1f))
                 Image(
-                    painter = painterResource(id = R.drawable.ic_forward), // Replace with your edit image resource
+                    painter = painterResource(id = R.drawable.ic_forward),
                     contentDescription = "Next",
                     modifier = Modifier
                         .padding(8.dp)
@@ -74,6 +76,7 @@ fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(), onNext: () -> Un
                         items = shoppingItems,
                         onItemCheckedChange = viewModel::onItemCheckedChange,
                         onUpdateItem = { oldItem, newItem -> viewModel.updateItem(oldItem, newItem) },
+                        onDeleteItem = { item -> viewModel.deleteItem(item) }, // Pass the delete action
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -88,12 +91,14 @@ fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(), onNext: () -> Un
                 Column(modifier = Modifier.weight(1f)) {
                     CookDoListCard(
                         items = cookDoItems,
-                        onUpdateItem = { index, newText -> cookDoItems[index] = newText },
+                        onItemCheckedChange = viewModel::onCookDoItemCheckedChange,
+                        onUpdateItem = { oldItem, newItem -> viewModel.updateCookDoItem(oldItem, newItem) },
+                        onDeleteItem = { item -> viewModel.deleteItem(item) }, // Pass the delete action
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     ElevatedButton(
-                        onClick = { cookDoItems.add("New cook-do") },
+                        onClick = { viewModel.addCookDoItem(ShoppingItem("New cook do")) },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(text = "Add a cook-do")
@@ -109,6 +114,7 @@ fun ShoppingListCard(
     items: List<ShoppingItem>,
     onItemCheckedChange: (ShoppingItem, Boolean) -> Unit,
     onUpdateItem: (ShoppingItem, ShoppingItem) -> Unit,
+    onDeleteItem: (ShoppingItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -121,18 +127,19 @@ fun ShoppingListCard(
         ) {
             item {
                 Text(
-                    text = "shopping list",
+                    text = "Shopping List",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = "today’s meal:", fontSize = 18.sp)
+                Text(text = "Today's meal:", fontSize = 18.sp)
                 Spacer(modifier = Modifier.height(8.dp))
             }
             items(items) { item ->
                 EditableCheckboxListItem(
                     item.name, item.isChecked,
                     onCheckedChange = { isChecked -> onItemCheckedChange(item, isChecked) },
-                    onUpdateText = { newText -> onUpdateItem(item, item.copy(name = newText)) }
+                    onUpdateText = { newText -> onUpdateItem(item, item.copy(name = newText)) },
+                    onDeleteItem = { onDeleteItem(item) }
                 )
             }
         }
@@ -141,8 +148,10 @@ fun ShoppingListCard(
 
 @Composable
 fun CookDoListCard(
-    items: List<String>,
-    onUpdateItem: (Int, String) -> Unit,
+    items: List<ShoppingItem>,
+    onItemCheckedChange: (ShoppingItem, Boolean) -> Unit,
+    onUpdateItem: (ShoppingItem, ShoppingItem) -> Unit,
+    onDeleteItem: (ShoppingItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -155,39 +164,68 @@ fun CookDoListCard(
         ) {
             item {
                 Text(
-                    text = "today’s cook-dos",
+                    text = "Cook Do List",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
+                Text(text = "Today's cook dos:", fontSize = 18.sp)
                 Spacer(modifier = Modifier.height(8.dp))
             }
-            items(items.size) { index ->
-                val item = items[index]
-                var isChecked by remember { mutableStateOf(item == "harvest some tomatoes") }
+            items(items) { item ->
                 EditableCheckboxListItem(
-                    text = item,
-                    checked = isChecked,
-                    onCheckedChange = { isChecked = it },
-                    onUpdateText = { newText -> onUpdateItem(index, newText) }
+                    item.name, item.isChecked,
+                    onCheckedChange = { isChecked -> onItemCheckedChange(item, isChecked) },
+                    onUpdateText = { newText -> onUpdateItem(item, item.copy(name = newText)) },
+                    onDeleteItem = { onDeleteItem(item) }
                 )
             }
         }
     }
 }
-
 @Composable
 fun EditableCheckboxListItem(
     text: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    onUpdateText: (String) -> Unit
+    onUpdateText: (String) -> Unit,
+    onDeleteItem: () -> Unit
 ) {
     var isEditing by remember { mutableStateOf(false) }
     var editText by remember { mutableStateOf(text) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = "Delete Item") },
+            text = { Text(text = "Are you sure you want to delete this item?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDeleteItem()
+                    showDialog = false
+                }) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        showDialog = true
+                    }
+                )
+            }
     ) {
         Checkbox(
             checked = checked,

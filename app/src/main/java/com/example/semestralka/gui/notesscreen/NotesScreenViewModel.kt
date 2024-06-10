@@ -55,6 +55,9 @@ class ShoppingListViewModel : ViewModel() {
             if (it == oldItem) newItem else it
         }
     }
+    fun deleteItem(item: ShoppingItem) {
+        _shoppingItems.value = _shoppingItems.value - item
+    }
 }
 
 data class ShoppingItem(val name: String, val isChecked: Boolean = false)
