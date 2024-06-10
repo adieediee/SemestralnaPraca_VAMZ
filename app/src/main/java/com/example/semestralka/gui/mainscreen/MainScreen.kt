@@ -1,10 +1,10 @@
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
+package com.example.semestralka.gui
+
+import ShoppingItem
+import ShoppingListViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -13,28 +13,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.semestralka.R
 import com.example.semestralka.gui.recipescreen.SharedViewModelMealCard
-
-
 import com.example.semestralka.navigation.NavigationDestination
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 object MainDestination : NavigationDestination {
     override val route = "main"
@@ -110,7 +105,7 @@ fun MealCard(sharedViewModelMealCard: SharedViewModelMealCard) {
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .padding(4.dp)
     ) {
         Column(
             modifier = Modifier
@@ -118,16 +113,38 @@ fun MealCard(sharedViewModelMealCard: SharedViewModelMealCard) {
                 .padding(16.dp)
         ) {
             selectedRecipe?.let { recipe ->
-                Image(
-                    painter = painterResource(id = R.drawable.food), // Replace with your image resource or use recipe.imageResId
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_meal), // Replace with your meal icon resource
+                        contentDescription = "Meal Icon",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = recipe.name,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                val imageRequest = ImageRequest.Builder(LocalContext.current)
+                    .data(recipe.imageUri ?: R.drawable.default_image_recipe)
+                    .crossfade(true)
+                    .placeholder(R.drawable.default_image_recipe)
+                    .error(R.drawable.default_image_recipe)
+                    .build()
+
+                AsyncImage(
+                    model = imageRequest,
                     contentDescription = recipe.name,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = recipe.name, fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        .clip(RoundedCornerShape(16.dp))
                 )
             } ?: run {
                 Text(
@@ -191,6 +208,7 @@ fun ShoppingListCard(viewModel: ShoppingListViewModel) {
         }
     }
 }
+
 @Composable
 fun CookDoListCard(viewModel: ShoppingListViewModel) {
     val configuration = LocalConfiguration.current
@@ -266,7 +284,3 @@ fun ElevatedButtonExample(text: String, onRecipe: () -> Unit) {
         )
     }
 }
-
-
-
-

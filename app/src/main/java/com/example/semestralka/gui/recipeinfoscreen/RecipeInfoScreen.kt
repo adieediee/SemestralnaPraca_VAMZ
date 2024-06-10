@@ -15,11 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.semestralka.R
 import com.example.semestralka.SharedViewModel
 import com.example.semestralka.database.Recipe
@@ -51,8 +54,15 @@ fun RecipeInfoScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.food), // Replace with your image resource
+                val imageRequest = ImageRequest.Builder(LocalContext.current)
+                    .data(it.imageUri ?: R.drawable.default_image_recipe)
+                    .crossfade(true)
+                    .placeholder(R.drawable.default_image_recipe)
+                    .error(R.drawable.default_image_recipe)
+                    .build()
+
+                AsyncImage(
+                    model = imageRequest,
                     contentDescription = it.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -60,6 +70,7 @@ fun RecipeInfoScreen(
                         .height(200.dp)
                         .clip(RoundedCornerShape(16.dp))
                 )
+
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = it.name,

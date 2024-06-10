@@ -1,7 +1,6 @@
 package com.example.semestralka.navigation
 
-import MainDestination
-import MainScreen
+
 import ShoppingListViewModel
 import ViewModelFactory
 import androidx.compose.runtime.Composable
@@ -13,6 +12,8 @@ import androidx.navigation.compose.composable
 import com.example.semestralka.SharedViewModel
 import com.example.semestralka.gui.AddRecipeDestination
 import com.example.semestralka.gui.AddRecipeScreen
+import com.example.semestralka.gui.MainDestination
+import com.example.semestralka.gui.MainScreen
 import com.example.semestralka.gui.RecipeDestination
 import com.example.semestralka.gui.RecipeInfoDestination
 import com.example.semestralka.gui.RecipeInfoScreen
