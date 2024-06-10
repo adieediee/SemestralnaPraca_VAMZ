@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Recipe::class], version = 7, exportSchema = false)
+@Database(entities = [Recipe::class], version = 8, exportSchema = false)
 abstract class RecipeDatabase : RoomDatabase() {
     abstract fun recipeDao(): RecipeDao
 
@@ -61,11 +61,11 @@ abstract class RecipeDatabase : RoomDatabase() {
             Log.d("RecipeDatabase", "Populating database with initial recipes")
             // Add initial recipes
             val recipes = listOf(
-                Recipe(name = "Stuffed Peppers with cheese sauce", time = "1h 30min", servings = "4-6 servings", ingredients = "Bell peppers, cheese", type = "dinner", method = "Stuff and bake"),
-                Recipe(name = "Easter cones as sweet nests", time = "2h", servings = "4-6 servings", ingredients = "Cones, sweets", type = "dessert", method = "Assemble and chill"),
-                Recipe(name = "One-Pan Cheesy Sausage Gnocchi", time = "45min", servings = "4 servings", ingredients = "Gnocchi, sausage, cheese", type = "dinner", method = "Cook in one pan"),
-                Recipe(name = "Strawberry Mochi cakes", time = "50min", servings = "8 servings", ingredients = "Strawberries, mochi", type = "dessert", method = "Bake and assemble"),
-                Recipe(name = "Homemade Lasagna", time = "2h", servings = "8 servings", ingredients = "Lasagna noodles, cheese, sauce", type = "dinner", method = "Layer and bake")
+                Recipe(name = "Stuffed Peppers with cheese sauce", time = "1h 30min", servings = "4-6 servings", ingredients = "Bell peppers, cheese", type = "dinner", method = "Stuff and bake", imageUri = null),
+                Recipe(name = "Easter cones as sweet nests", time = "2h", servings = "4-6 servings", ingredients = "Cones, sweets", type = "dessert", method = "Assemble and chill",imageUri = null),
+                Recipe(name = "One-Pan Cheesy Sausage Gnocchi", time = "45min", servings = "4 servings", ingredients = "Gnocchi, sausage, cheese", type = "dinner", method = "Cook in one pan",imageUri = null),
+                Recipe(name = "Strawberry Mochi cakes", time = "50min", servings = "8 servings", ingredients = "Strawberries, mochi", type = "dessert", method = "Bake and assemble",imageUri = null),
+                Recipe(name = "Homemade Lasagna", time = "2h", servings = "8 servings", ingredients = "Lasagna noodles, cheese, sauce", type = "dinner", method = "Layer and bake",imageUri = null)
             )
             recipes.forEach {
                 Log.d("RecipeDatabase", "Inserting recipe: ${it.name}")

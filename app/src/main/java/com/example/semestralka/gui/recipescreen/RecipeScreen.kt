@@ -19,14 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.semestralka.R
 import com.example.semestralka.SharedViewModel
-
 import com.example.semestralka.database.Recipe
 import com.example.semestralka.navigation.NavigationDestination
 
@@ -127,14 +129,24 @@ fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
                 modifier = Modifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val imageRequest = ImageRequest.Builder(LocalContext.current)
+                    .data(recipe.imageUri ?: R.drawable.default_image_recipe)
+                    .crossfade(true)
+                    .placeholder(R.drawable.default_image_recipe)
+                    .error(R.drawable.default_image_recipe)
+                    .build()
+
+                val painter = rememberAsyncImagePainter(model = imageRequest)
+
                 Image(
-                    painter = painterResource(id = R.drawable.food),
+                    painter = painter,
                     contentDescription = recipe.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(100.dp)
                         .clip(RoundedCornerShape(16.dp))
                 )
+
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(

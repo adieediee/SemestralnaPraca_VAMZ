@@ -16,5 +16,6 @@ data class Recipe(
     val ingredients: String,
     val type: String,
     val method: String,
-    var isSelected: Boolean = false
+    var isSelected: Boolean = false,
+    val imageUri: String?
 )

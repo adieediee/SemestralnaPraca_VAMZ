@@ -1,7 +1,12 @@
 package com.example.semestralka.gui
 
 import ViewModelFactory
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -9,16 +14,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.semestralka.RecipeApplication
-import com.example.semestralka.navigation.NavigationDestination
+import coil.compose.rememberImagePainter
 import com.example.semestralka.R
-
+import com.example.semestralka.navigation.NavigationDestination
 
 object AddRecipeDestination : NavigationDestination {
     override val route = "add_recipes"
@@ -30,6 +34,14 @@ fun AddRecipeScreen(
     navController: NavController,
     viewModel: AddRecipeViewModel = viewModel(factory = ViewModelFactory)
 ) {
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        uri?.let {
+            context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            viewModel.imageUri = it.toString()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -94,6 +106,20 @@ fun AddRecipeScreen(
                 label = { Text("Method") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(onClick = { launcher.launch(arrayOf("image/*")) }) {
+                Text("Pick Image")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            viewModel.imageUri?.let { uri ->
+                Image(
+                    painter = rememberImagePainter(data = uri),
+                    contentDescription = null,
+                    modifier = Modifier.size(200.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {

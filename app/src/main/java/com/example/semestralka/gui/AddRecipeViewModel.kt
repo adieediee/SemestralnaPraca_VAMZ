@@ -17,6 +17,7 @@ class AddRecipeViewModel(private val repository: RecipeRepository) : ViewModel()
     var ingredients by mutableStateOf("")
     var type by mutableStateOf("")
     var method by mutableStateOf("")
+    var imageUri by mutableStateOf<String?>(null)
 
     fun insertRecipe(onRecipeInserted: () -> Unit) {
         val recipe = Recipe(
@@ -25,7 +26,8 @@ class AddRecipeViewModel(private val repository: RecipeRepository) : ViewModel()
             servings = servings,
             ingredients = ingredients,
             type = type,
-            method = method
+            method = method,
+            imageUri = imageUri
         )
         viewModelScope.launch {
             repository.insertRecipe(recipe)
