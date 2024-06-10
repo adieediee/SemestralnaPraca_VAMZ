@@ -29,6 +29,7 @@ object AddRecipeDestination : NavigationDestination {
     const val recipeIdArg = "recipeId"
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRecipeScreen(
@@ -50,6 +51,7 @@ fun AddRecipeScreen(
         uri?.let {
             context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             imageUri = it
+            viewModel.imageUri = it.toString() // Update the image URI in the ViewModel
         }
     }
 

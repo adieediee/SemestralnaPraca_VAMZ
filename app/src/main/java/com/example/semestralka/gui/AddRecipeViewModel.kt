@@ -48,7 +48,7 @@ class AddRecipeViewModel(private val repository: RecipeRepository) : ViewModel()
             if (recipeId == null) {
                 repository.insertRecipe(recipe)
             } else {
-                repository.updateRecipe(recipe)
+                repository.updateRecipe(recipe.copy(id = recipeId))
             }
             onComplete()
         }

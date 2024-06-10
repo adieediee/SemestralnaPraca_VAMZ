@@ -7,8 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.semestralka.SharedViewModel
 import com.example.semestralka.gui.AddRecipeDestination
 import com.example.semestralka.gui.AddRecipeScreen
@@ -51,10 +53,17 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
         composable(route = RecipeInfoDestination.route) { backStackEntry ->
             RecipeInfoScreen(
                 onBack = { navController.navigateUp() },
-                onEdit = { /* Implement edit action */ },
+                onEdit = { recipeId -> navController.navigate("${AddRecipeDestination.route}/$recipeId") },
                 sharedViewModel = sharedViewModel,
                 sharedViewModelMealCard = sharedViewModelMealCard
             )
+        }
+        composable(
+            route = "${AddRecipeDestination.route}/{${AddRecipeDestination.recipeIdArg}}",
+            arguments = listOf(navArgument(AddRecipeDestination.recipeIdArg) { type = NavType.IntType })
+        ) { backStackEntry ->
+            val recipeId = backStackEntry.arguments?.getInt(AddRecipeDestination.recipeIdArg)
+            AddRecipeScreen(navController = navController, recipeId = recipeId)
         }
         composable(route = NotesDestination.route) {
             NotesScreen(
@@ -63,8 +72,7 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
             )
         }
         composable(route = AddRecipeDestination.route) {
-
-            AddRecipeScreen(navController)
+            AddRecipeScreen(navController = navController)
         }
     }
 }

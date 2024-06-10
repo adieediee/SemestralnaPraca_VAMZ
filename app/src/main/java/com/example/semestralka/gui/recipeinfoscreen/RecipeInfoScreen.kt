@@ -34,16 +34,17 @@ object RecipeInfoDestination : NavigationDestination {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun RecipeInfoScreen(
     onBack: () -> Unit,
-    onEdit: () -> Unit,
+    onEdit: (Int) -> Unit,
     sharedViewModel: SharedViewModel,
     sharedViewModelMealCard: SharedViewModelMealCard
 ) {
     val recipe by sharedViewModel.selectedRecipe.collectAsState()
 
-    recipe?.let {
+    recipe?.let { recipe ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -55,7 +56,7 @@ fun RecipeInfoScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 val imageRequest = ImageRequest.Builder(LocalContext.current)
-                    .data(it.imageUri ?: R.drawable.default_image_recipe)
+                    .data(recipe.imageUri ?: R.drawable.default_image_recipe)
                     .crossfade(true)
                     .placeholder(R.drawable.default_image_recipe)
                     .error(R.drawable.default_image_recipe)
@@ -63,7 +64,7 @@ fun RecipeInfoScreen(
 
                 AsyncImage(
                     model = imageRequest,
-                    contentDescription = it.name,
+                    contentDescription = recipe.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -73,7 +74,7 @@ fun RecipeInfoScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = it.name,
+                    text = recipe.name,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 8.dp)
@@ -85,23 +86,23 @@ fun RecipeInfoScreen(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(painter = painterResource(id = R.drawable.ic_time), contentDescription = "Time")
-                        Text(text = it.time)
+                        Text(text = recipe.time)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(painter = painterResource(id = R.drawable.ic_servings), contentDescription = "Servings")
-                        Text(text = it.servings)
+                        Text(text = recipe.servings)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(painter = painterResource(id = R.drawable.ic_meal), contentDescription = "Type")
-                        Text(text = it.type)
+                        Text(text = recipe.type)
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                IngredientsList(it.ingredients)
+                IngredientsList(recipe.ingredients)
                 Spacer(modifier = Modifier.height(16.dp))
-                RecipeSteps(it.method)
+                RecipeSteps(recipe.method)
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { sharedViewModelMealCard.selectRecipe(it) }) {
+                Button(onClick = { sharedViewModelMealCard.selectRecipe(recipe) }) {
                     Text("Select for Today")
                 }
             }
@@ -124,7 +125,7 @@ fun RecipeInfoScreen(
                     .padding(8.dp)
                     .size(48.dp)
                     .clip(CircleShape)
-                    .clickable(onClick = onEdit)
+                    .clickable(onClick = { onEdit(recipe.id) })
             )
         }
     }

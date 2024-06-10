@@ -3,6 +3,7 @@ package com.example.semestralka.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +16,7 @@ interface RecipeDao {
     @Query("SELECT * FROM recipe WHERE id = :id LIMIT 1")
     suspend fun getRecipeById(id: Int): Recipe?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(recipe: Recipe)
 
     @Update
