@@ -63,6 +63,7 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
             )
         }
         composable(route = AddRecipeDestination.route) {
+
             AddRecipeScreen(navController)
         }
     }

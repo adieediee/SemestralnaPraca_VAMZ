@@ -10,7 +10,6 @@ import com.example.semestralka.database.RecipeRepository
 import kotlinx.coroutines.launch
 
 class AddRecipeViewModel(private val repository: RecipeRepository) : ViewModel() {
-
     var name by mutableStateOf("")
     var time by mutableStateOf("")
     var servings by mutableStateOf("")
@@ -19,8 +18,24 @@ class AddRecipeViewModel(private val repository: RecipeRepository) : ViewModel()
     var method by mutableStateOf("")
     var imageUri by mutableStateOf<String?>(null)
 
-    fun insertRecipe(onRecipeInserted: () -> Unit) {
+    fun loadRecipe(recipeId: Int) {
+        viewModelScope.launch {
+            val recipe = repository.getRecipeById(recipeId)
+            recipe?.let {
+                name = it.name
+                time = it.time
+                servings = it.servings
+                ingredients = it.ingredients
+                type = it.type
+                method = it.method
+                imageUri = it.imageUri
+            }
+        }
+    }
+
+    fun saveRecipe(recipeId: Int?, onComplete: () -> Unit) {
         val recipe = Recipe(
+            id = recipeId ?: 0,
             name = name,
             time = time,
             servings = servings,
@@ -30,8 +45,12 @@ class AddRecipeViewModel(private val repository: RecipeRepository) : ViewModel()
             imageUri = imageUri
         )
         viewModelScope.launch {
-            repository.insertRecipe(recipe)
-            onRecipeInserted()
+            if (recipeId == null) {
+                repository.insertRecipe(recipe)
+            } else {
+                repository.updateRecipe(recipe)
+            }
+            onComplete()
         }
     }
 }

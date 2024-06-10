@@ -14,10 +14,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
@@ -26,26 +26,37 @@ import com.example.semestralka.navigation.NavigationDestination
 
 object AddRecipeDestination : NavigationDestination {
     override val route = "add_recipes"
+    const val recipeIdArg = "recipeId"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRecipeScreen(
     navController: NavController,
+    recipeId: Int? = null,
     viewModel: AddRecipeViewModel = viewModel(factory = ViewModelFactory)
 ) {
     val context = LocalContext.current
+
+    LaunchedEffect(recipeId) {
+        recipeId?.let {
+            viewModel.loadRecipe(it)
+        }
+    }
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
             context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            viewModel.imageUri = it.toString()
+            imageUri = it
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Recipe") },
+                title = { Text(if (recipeId != null) "Edit Recipe" else "Add Recipe") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -112,9 +123,9 @@ fun AddRecipeScreen(
                 Text("Pick Image")
             }
             Spacer(modifier = Modifier.height(16.dp))
-            viewModel.imageUri?.let { uri ->
+            imageUri?.let {
                 Image(
-                    painter = rememberImagePainter(data = uri),
+                    painter = rememberImagePainter(data = it),
                     contentDescription = null,
                     modifier = Modifier.size(200.dp)
                 )
@@ -123,7 +134,7 @@ fun AddRecipeScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-                    viewModel.insertRecipe {
+                    viewModel.saveRecipe(recipeId) {
                         navController.navigateUp()
                     }
                 },
