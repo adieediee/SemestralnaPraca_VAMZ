@@ -13,4 +13,5 @@ interface RecipeRepository {
 
     suspend fun selectRecipe(recipe: Recipe)
     fun searchRecipesByName(searchText: String): Flow<List<Recipe>>
+    suspend fun deleteRecipeById(recipeId: Int)
 }

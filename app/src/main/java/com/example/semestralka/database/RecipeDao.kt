@@ -32,4 +32,7 @@ interface RecipeDao {
 
     @Query("SELECT * FROM recipe WHERE name LIKE '%' || :searchText || '%' ORDER BY name ASC")
     fun searchRecipesByName(searchText: String): Flow<List<Recipe>>
+
+    @Query("DELETE FROM recipe WHERE id = :recipeId")
+    suspend fun deleteRecipeById(recipeId: Int)
 }

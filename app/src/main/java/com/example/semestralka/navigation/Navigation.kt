@@ -27,7 +27,7 @@ import com.example.semestralka.gui.mainscreen.NotesScreen
 
 @Composable
 fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
-    val sharedViewModel: SharedViewModel = viewModel()
+    val sharedViewModel: SharedViewModel = viewModel(factory = ViewModelFactory)
     val shoppingListViewModel: ShoppingListViewModel = viewModel()
     val sharedViewModelMealCard: SharedViewModelMealCard = viewModel(factory = ViewModelFactory)
 
@@ -55,6 +55,10 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
             RecipeInfoScreen(
                 onBack = { navController.navigateUp() },
                 onEdit = { recipeId -> navController.navigate("${AddRecipeDestination.route}/$recipeId") },
+                onDelete = { recipeId ->
+                    sharedViewModel.deleteRecipe(recipeId)
+                    navController.navigateUp() // Navigate back after deletion
+                },
                 sharedViewModel = sharedViewModel,
                 sharedViewModelMealCard = sharedViewModelMealCard
             )

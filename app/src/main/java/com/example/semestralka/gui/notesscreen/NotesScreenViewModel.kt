@@ -1,6 +1,7 @@
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.count
 
 class ShoppingListViewModel : ViewModel() {
 
@@ -55,9 +56,14 @@ class ShoppingListViewModel : ViewModel() {
             if (it == oldItem) newItem else it
         }
     }
+
     fun deleteItem(item: ShoppingItem) {
         _shoppingItems.value = _shoppingItems.value - item
     }
+    fun deleteCookDoItem(item: ShoppingItem) {
+        _cookDoItems.value = _cookDoItems.value - item
+    }
+
 }
 
 data class ShoppingItem(val name: String, val isChecked: Boolean = false)

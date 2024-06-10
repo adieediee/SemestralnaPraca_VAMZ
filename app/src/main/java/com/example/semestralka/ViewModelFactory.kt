@@ -1,6 +1,7 @@
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.semestralka.SharedViewModel
 import com.example.semestralka.database.RecipeRepository
 import com.example.semestralka.gui.AddRecipeViewModel
 import com.example.semestralka.gui.RecipeListViewModel
@@ -22,6 +23,9 @@ object ViewModelFactory : ViewModelProvider.Factory {
             }
             modelClass.isAssignableFrom(SharedViewModelMealCard::class.java) -> {
                 SharedViewModelMealCard(application, recipeRepository) as T
+            }
+            modelClass.isAssignableFrom(SharedViewModel::class.java) -> {
+                SharedViewModel(recipeRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }

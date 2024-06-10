@@ -33,4 +33,8 @@ class OfflineRecipeRepository(private val recipeDao: RecipeDao) : RecipeReposito
     override fun searchRecipesByName(searchText: String): Flow<List<Recipe>> {
         return recipeDao.searchRecipesByName(searchText)
     }
+
+    override suspend fun deleteRecipeById(recipeId: Int) {
+        recipeDao.deleteRecipeById(recipeId)
+    }
 }

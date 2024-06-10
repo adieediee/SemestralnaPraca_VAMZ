@@ -9,9 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +25,6 @@ import coil.request.ImageRequest
 import com.example.semestralka.R
 import com.example.semestralka.SharedViewModel
 import com.example.semestralka.database.Recipe
-
 import com.example.semestralka.navigation.NavigationDestination
 
 object RecipeInfoDestination : NavigationDestination {
@@ -35,17 +32,28 @@ object RecipeInfoDestination : NavigationDestination {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun RecipeInfoScreen(
     onBack: () -> Unit,
     onEdit: (Int) -> Unit,
+    onDelete: (Int) -> Unit,  // New parameter for deletion callback
     sharedViewModel: SharedViewModel,
     sharedViewModelMealCard: SharedViewModelMealCard
 ) {
     val recipe by sharedViewModel.selectedRecipe.collectAsState()
+    var showDialog by remember { mutableStateOf(false) } // State for showing the dialog
 
     recipe?.let { recipe ->
+        if (showDialog) {
+            DeleteConfirmationDialog(
+                onConfirm = {
+                    onDelete(recipe.id)
+                    showDialog = false
+                },
+                onDismiss = { showDialog = false }
+            )
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -106,6 +114,13 @@ fun RecipeInfoScreen(
                 Button(onClick = { sharedViewModelMealCard.selectRecipe(recipe) }) {
                     Text("Select for Today")
                 }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = { showDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete Recipe")
+                }
             }
 
             Image(
@@ -130,6 +145,25 @@ fun RecipeInfoScreen(
             )
         }
     }
+}
+
+@Composable
+fun DeleteConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Delete Recipe") },
+        text = { Text(text = "Are you sure you want to delete this recipe?") },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Delete")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 @Composable
