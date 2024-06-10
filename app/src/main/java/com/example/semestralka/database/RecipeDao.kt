@@ -29,4 +29,7 @@ interface RecipeDao {
 
     @Query("UPDATE recipe SET isSelected = 0")
     suspend fun clearSelectedRecipe()
+
+    @Query("SELECT * FROM recipe WHERE name LIKE '%' || :searchText || '%' ORDER BY name ASC")
+    fun searchRecipesByName(searchText: String): Flow<List<Recipe>>
 }

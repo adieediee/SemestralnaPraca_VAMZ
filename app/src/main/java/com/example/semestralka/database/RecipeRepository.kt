@@ -1,5 +1,6 @@
 package com.example.semestralka.database
 
+import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 interface RecipeRepository {
@@ -11,4 +12,5 @@ interface RecipeRepository {
     suspend fun getSelectedRecipe(): Recipe?
 
     suspend fun selectRecipe(recipe: Recipe)
+    fun searchRecipesByName(searchText: String): Flow<List<Recipe>>
 }

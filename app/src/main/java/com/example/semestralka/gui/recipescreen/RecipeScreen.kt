@@ -14,6 +14,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,7 +47,8 @@ fun RecipeScreen(
     sharedViewModel: SharedViewModel,
     viewModel: RecipeListViewModel = viewModel(factory = ViewModelFactory)
 ) {
-    val recipes by viewModel.allRecipes.collectAsState(initial = emptyList())
+    val searchText by viewModel.searchText.collectAsState()
+    val recipes by viewModel.recipes.collectAsState()
 
     Log.d("RecipeScreen", "Loaded recipes: ${recipes.size}")
     recipes.forEach { recipe ->
@@ -77,7 +81,7 @@ fun RecipeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            SearchBar()
+            SearchBar(searchText, onSearchTextChanged = { viewModel.onSearchTextChanged(it) })
 
             val iconModifier = Modifier.size(60.dp)
 
@@ -193,15 +197,15 @@ fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar() {
+fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit) {
     Row(
         modifier = Modifier
             .background(Color.LightGray, RoundedCornerShape(16.dp)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextField(
-            value = "",
-            onValueChange = {},
+            value = searchText,
+            onValueChange = onSearchTextChanged,
             placeholder = { Text("Search") },
             modifier = Modifier.weight(1f),
             colors = TextFieldDefaults.textFieldColors(

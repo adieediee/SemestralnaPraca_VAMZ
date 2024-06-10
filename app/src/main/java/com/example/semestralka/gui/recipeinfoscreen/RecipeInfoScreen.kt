@@ -1,5 +1,6 @@
 package com.example.semestralka.gui
 
+import SharedViewModelMealCard
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,7 +27,7 @@ import coil.request.ImageRequest
 import com.example.semestralka.R
 import com.example.semestralka.SharedViewModel
 import com.example.semestralka.database.Recipe
-import com.example.semestralka.gui.recipescreen.SharedViewModelMealCard
+
 import com.example.semestralka.navigation.NavigationDestination
 
 object RecipeInfoDestination : NavigationDestination {

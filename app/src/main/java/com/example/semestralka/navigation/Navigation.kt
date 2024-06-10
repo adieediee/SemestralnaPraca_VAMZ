@@ -1,6 +1,7 @@
 package com.example.semestralka.navigation
 
 
+import SharedViewModelMealCard
 import ShoppingListViewModel
 import ViewModelFactory
 import androidx.compose.runtime.Composable
@@ -22,7 +23,7 @@ import com.example.semestralka.gui.RecipeInfoScreen
 import com.example.semestralka.gui.RecipeScreen
 import com.example.semestralka.gui.mainscreen.NotesDestination
 import com.example.semestralka.gui.mainscreen.NotesScreen
-import com.example.semestralka.gui.recipescreen.SharedViewModelMealCard
+
 
 @Composable
 fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {

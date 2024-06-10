@@ -29,4 +29,8 @@ class OfflineRecipeRepository(private val recipeDao: RecipeDao) : RecipeReposito
         recipe.isSelected = true
         recipeDao.update(recipe)
     }
+
+    override fun searchRecipesByName(searchText: String): Flow<List<Recipe>> {
+        return recipeDao.searchRecipesByName(searchText)
+    }
 }
