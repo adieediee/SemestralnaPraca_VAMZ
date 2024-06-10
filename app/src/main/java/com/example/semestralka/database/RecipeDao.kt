@@ -23,4 +23,9 @@ interface RecipeDao {
 
     @Delete
     suspend fun delete(recipe: Recipe)
+    @Query("SELECT * FROM recipe WHERE isSelected = 1 LIMIT 1")
+    suspend fun getSelectedRecipe(): Recipe?
+
+    @Query("UPDATE recipe SET isSelected = 0")
+    suspend fun clearSelectedRecipe()
 }

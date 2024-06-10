@@ -1,10 +1,9 @@
-package com.example.semestralka
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.semestralka.database.RecipeRepository
 import com.example.semestralka.gui.AddRecipeViewModel
 import com.example.semestralka.gui.RecipeListViewModel
+import com.example.semestralka.gui.recipescreen.SharedViewModelMealCard
 
 object ViewModelFactory : ViewModelProvider.Factory {
 
@@ -18,7 +17,9 @@ object ViewModelFactory : ViewModelProvider.Factory {
             modelClass.isAssignableFrom(RecipeListViewModel::class.java) -> {
                 RecipeListViewModel(recipeRepository) as T
             }
-
+            modelClass.isAssignableFrom(SharedViewModelMealCard::class.java) -> {
+                SharedViewModelMealCard(recipeRepository) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }

@@ -19,4 +19,14 @@ class OfflineRecipeRepository(private val recipeDao: RecipeDao) : RecipeReposito
     override suspend fun updateRecipe(recipe: Recipe) {
         recipeDao.update(recipe)
     }
+
+    override suspend fun getSelectedRecipe(): Recipe? {
+        return recipeDao.getSelectedRecipe()
+    }
+
+    override suspend fun selectRecipe(recipe: Recipe) {
+        recipeDao.clearSelectedRecipe()
+        recipe.isSelected = true
+        recipeDao.update(recipe)
+    }
 }

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 
 import com.example.semestralka.R
+import com.example.semestralka.gui.recipescreen.SharedViewModelMealCard
 
 
 import com.example.semestralka.navigation.NavigationDestination
@@ -40,7 +41,12 @@ object MainDestination : NavigationDestination {
 }
 
 @Composable
-fun MainScreen(onPrevious: () -> Unit, onNext: () -> Unit, viewModel: ShoppingListViewModel) {
+fun MainScreen(
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+    viewModel: ShoppingListViewModel,
+    sharedViewModelMealCard: SharedViewModelMealCard
+) {
     Scaffold(bottomBar = {
         BottomAppBar(
             modifier = Modifier.height(60.dp),
@@ -87,7 +93,7 @@ fun MainScreen(onPrevious: () -> Unit, onNext: () -> Unit, viewModel: ShoppingLi
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            MealCard()
+            MealCard(sharedViewModelMealCard)
             Spacer(modifier = Modifier.height(16.dp))
             ListsRow(viewModel)
             Spacer(modifier = Modifier.height(16.dp))
@@ -96,7 +102,9 @@ fun MainScreen(onPrevious: () -> Unit, onNext: () -> Unit, viewModel: ShoppingLi
 }
 
 @Composable
-fun MealCard() {
+fun MealCard(sharedViewModelMealCard: SharedViewModelMealCard) {
+    val selectedRecipe by sharedViewModelMealCard.selectedRecipe.collectAsState()
+
     Card(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -109,17 +117,25 @@ fun MealCard() {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.food), // Replace with your image resource
-                contentDescription = "Homemade Lasagna",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Homemade Lasagna", fontSize = 24.sp, fontWeight = FontWeight.Bold
-            )
+            selectedRecipe?.let { recipe ->
+                Image(
+                    painter = painterResource(id = R.drawable.food), // Replace with your image resource or use recipe.imageResId
+                    contentDescription = recipe.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = recipe.name, fontSize = 24.sp, fontWeight = FontWeight.Bold
+                )
+            } ?: run {
+                Text(
+                    text = "No recipe selected",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }

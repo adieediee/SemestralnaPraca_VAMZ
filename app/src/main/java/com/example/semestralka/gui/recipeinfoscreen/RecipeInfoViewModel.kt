@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.semestralka.ViewModelFactory
+
 import com.example.semestralka.database.Recipe
 import com.example.semestralka.database.RecipeRepository
 import kotlinx.coroutines.flow.MutableStateFlow

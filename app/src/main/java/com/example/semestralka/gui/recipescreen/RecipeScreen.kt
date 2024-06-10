@@ -1,5 +1,6 @@
 package com.example.semestralka.gui
 
+import ViewModelFactory
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.semestralka.R
 import com.example.semestralka.SharedViewModel
-import com.example.semestralka.ViewModelFactory
+
 import com.example.semestralka.database.Recipe
 import com.example.semestralka.navigation.NavigationDestination
 

@@ -1,5 +1,6 @@
 package com.example.semestralka.gui
 
+import ViewModelFactory
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,7 +18,7 @@ import androidx.navigation.NavController
 import com.example.semestralka.RecipeApplication
 import com.example.semestralka.navigation.NavigationDestination
 import com.example.semestralka.R
-import com.example.semestralka.ViewModelFactory
+
 
 object AddRecipeDestination : NavigationDestination {
     override val route = "add_recipes"

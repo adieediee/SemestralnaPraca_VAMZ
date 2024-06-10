@@ -22,17 +22,21 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.semestralka.R
 import com.example.semestralka.SharedViewModel
+import com.example.semestralka.database.Recipe
+import com.example.semestralka.gui.recipescreen.SharedViewModelMealCard
 import com.example.semestralka.navigation.NavigationDestination
 
 object RecipeInfoDestination : NavigationDestination {
     override val route = "recipeInfo"
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeInfoScreen(
     onBack: () -> Unit,
     onEdit: () -> Unit,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    sharedViewModelMealCard: SharedViewModelMealCard
 ) {
     val recipe by sharedViewModel.selectedRecipe.collectAsState()
 
@@ -85,6 +89,10 @@ fun RecipeInfoScreen(
                 IngredientsList(it.ingredients)
                 Spacer(modifier = Modifier.height(16.dp))
                 RecipeSteps(it.method)
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { sharedViewModelMealCard.selectRecipe(it) }) {
+                    Text("Select for Today")
+                }
             }
 
             Image(
