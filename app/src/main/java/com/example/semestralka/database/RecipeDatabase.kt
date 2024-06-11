@@ -1,5 +1,7 @@
 package com.example.semestralka.database
 
+
+
 import android.content.Context
 import android.util.Log
 import androidx.room.Database
@@ -9,10 +11,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Recipe::class], version = 8, exportSchema = false)
+@Database(entities = [Recipe::class, NoteItem::class], version = 9, exportSchema = false)
 abstract class RecipeDatabase : RoomDatabase() {
     abstract fun recipeDao(): RecipeDao
-
+    abstract fun noteItemDao(): NoteItemDao
     companion object {
 
         @Volatile

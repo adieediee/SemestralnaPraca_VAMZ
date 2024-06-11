@@ -1,6 +1,7 @@
 package com.example.semestralka.gui
 
 import SharedViewModelMealCard
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,7 +25,10 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.semestralka.R
 import com.example.semestralka.SharedViewModel
+import com.example.semestralka.database.NoteItem
+import com.example.semestralka.database.NoteType
 import com.example.semestralka.database.Recipe
+import com.example.semestralka.gui.notesscreen.ShoppingListViewModel
 import com.example.semestralka.navigation.NavigationDestination
 
 object RecipeInfoDestination : NavigationDestination {
@@ -36,12 +40,13 @@ object RecipeInfoDestination : NavigationDestination {
 fun RecipeInfoScreen(
     onBack: () -> Unit,
     onEdit: (Int) -> Unit,
-    onDelete: (Int) -> Unit,  // New parameter for deletion callback
+    onDelete: (Int) -> Unit,
     sharedViewModel: SharedViewModel,
-    sharedViewModelMealCard: SharedViewModelMealCard
+    sharedViewModelMealCard: SharedViewModelMealCard,
+    shoppingListViewModel: ShoppingListViewModel // Add ShoppingListViewModel as a parameter
 ) {
     val recipe by sharedViewModel.selectedRecipe.collectAsState()
-    var showDialog by remember { mutableStateOf(false) } // State for showing the dialog
+    var showDialog by remember { mutableStateOf(false) }
 
     recipe?.let { recipe ->
         if (showDialog) {
@@ -107,7 +112,10 @@ fun RecipeInfoScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                IngredientsList(recipe.ingredients)
+                IngredientsList(recipe.ingredients) { ingredient ->
+
+                    shoppingListViewModel.addItemWithName(ingredient)
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 RecipeSteps(recipe.method)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -124,7 +132,7 @@ fun RecipeInfoScreen(
             }
 
             Image(
-                painter = painterResource(id = R.drawable.ic_back), // Replace with your back image resource
+                painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Back",
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -134,7 +142,7 @@ fun RecipeInfoScreen(
                     .clickable(onClick = onBack)
             )
             Image(
-                painter = painterResource(id = R.drawable.ic_edit), // Replace with your edit image resource
+                painter = painterResource(id = R.drawable.ic_edit),
                 contentDescription = "Edit",
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -167,7 +175,8 @@ fun DeleteConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun IngredientsList(ingredients: String) {
+
+fun IngredientsList(ingredients: String, onAddToShoppingList: (String) -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -184,12 +193,17 @@ fun IngredientsList(ingredients: String) {
             ingredientList.forEach { ingredient ->
                 CheckboxListItemRecipe(text = ingredient)
             }
-            TextButton(onClick = { /* Add to shopping list */ }) {
+            TextButton(onClick = {
+                ingredientList.forEach { ingredient ->
+                    onAddToShoppingList(ingredient)
+                }
+            }) {
                 Text(text = "Add to shopping list")
             }
         }
     }
 }
+
 
 @Composable
 fun RecipeSteps(method: String) {

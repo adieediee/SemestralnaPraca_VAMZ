@@ -5,13 +5,14 @@ import com.example.semestralka.SharedViewModel
 import com.example.semestralka.database.RecipeRepository
 import com.example.semestralka.gui.AddRecipeViewModel
 import com.example.semestralka.gui.RecipeListViewModel
+import com.example.semestralka.gui.notesscreen.ShoppingListViewModel
 
 
 object ViewModelFactory : ViewModelProvider.Factory {
 
     private lateinit var application: Application
     lateinit var recipeRepository: RecipeRepository
-
+    lateinit var noteRepository: NoteItemRepository
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
@@ -26,13 +27,16 @@ object ViewModelFactory : ViewModelProvider.Factory {
             }
             modelClass.isAssignableFrom(SharedViewModel::class.java) -> {
                 SharedViewModel(recipeRepository) as T
+            }modelClass.isAssignableFrom(ShoppingListViewModel::class.java) -> {
+                ShoppingListViewModel(noteRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 
-    fun init(repository: RecipeRepository,app: Application) {
+    fun init(repository: RecipeRepository,app: Application,noteItemRepository : NoteItemRepository) {
         recipeRepository = repository
         application = app
+        noteRepository = noteItemRepository
     }
 }

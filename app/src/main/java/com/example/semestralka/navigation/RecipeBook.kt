@@ -1,4 +1,4 @@
-package com.example.semestralka.gui
+package com.example.semestralka.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

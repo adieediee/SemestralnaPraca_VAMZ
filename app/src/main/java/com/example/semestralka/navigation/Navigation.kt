@@ -2,11 +2,12 @@ package com.example.semestralka.navigation
 
 
 import SharedViewModelMealCard
-import ShoppingListViewModel
+
 import ViewModelFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,14 +22,16 @@ import com.example.semestralka.gui.RecipeDestination
 import com.example.semestralka.gui.RecipeInfoDestination
 import com.example.semestralka.gui.RecipeInfoScreen
 import com.example.semestralka.gui.RecipeScreen
-import com.example.semestralka.gui.mainscreen.NotesDestination
-import com.example.semestralka.gui.mainscreen.NotesScreen
+
+import com.example.semestralka.gui.notesscreen.NotesDestination
+import com.example.semestralka.gui.notesscreen.NotesScreen
+import com.example.semestralka.gui.notesscreen.ShoppingListViewModel
 
 
 @Composable
 fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
     val sharedViewModel: SharedViewModel = viewModel(factory = ViewModelFactory)
-    val shoppingListViewModel: ShoppingListViewModel = viewModel()
+    val shoppingListViewModel: ShoppingListViewModel = viewModel(factory = ViewModelFactory)
     val sharedViewModelMealCard: SharedViewModelMealCard = viewModel(factory = ViewModelFactory)
 
     NavHost(navController = navController,
@@ -60,7 +63,8 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
                     navController.navigateUp() // Navigate back after deletion
                 },
                 sharedViewModel = sharedViewModel,
-                sharedViewModelMealCard = sharedViewModelMealCard
+                sharedViewModelMealCard = sharedViewModelMealCard,
+                shoppingListViewModel = shoppingListViewModel
             )
         }
         composable(

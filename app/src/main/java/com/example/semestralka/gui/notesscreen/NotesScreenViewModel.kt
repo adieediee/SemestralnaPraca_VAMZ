@@ -1,69 +1,79 @@
+package com.example.semestralka.gui.notesscreen
+
+import NoteItemRepository
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.semestralka.database.NoteItem
+import com.example.semestralka.database.NoteType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.count
 
-class ShoppingListViewModel : ViewModel() {
+import kotlinx.coroutines.launch
 
-    private val _shoppingItems = MutableStateFlow(
-        listOf(
-            ShoppingItem("90g prosciutto"),
-            ShoppingItem("125g ball mozzarella"),
-            ShoppingItem("750g minced beef"),
-            ShoppingItem("200ml white sauce"),
-        )
-    )
-    val shoppingItems: StateFlow<List<ShoppingItem>> = _shoppingItems
 
-    private val _cookDoItems = MutableStateFlow(
-        listOf(
-            ShoppingItem("Prep the veggies"),
-            ShoppingItem("Restock spices"),
-            ShoppingItem("Meal prep for the weekend"),
-            ShoppingItem("Harvest some tomatoes")
-        )
-    )
-    val cookDoItems: StateFlow<List<ShoppingItem>> = _cookDoItems
+class ShoppingListViewModel(private val repository: NoteItemRepository) : ViewModel() {
 
-    fun onItemCheckedChange(item: ShoppingItem, isChecked: Boolean) {
-        _shoppingItems.value = _shoppingItems.value.map {
-            if (it == item) it.copy(isChecked = isChecked) else it
+    private val _shoppingItems = MutableStateFlow<List<NoteItem>>(emptyList())
+    val shoppingItems: StateFlow<List<NoteItem>> = _shoppingItems
+
+    private val _cookDoItems = MutableStateFlow<List<NoteItem>>(emptyList())
+    val cookDoItems: StateFlow<List<NoteItem>> = _cookDoItems
+
+    private var itemCount = 0
+
+    init {
+        viewModelScope.launch {
+            _shoppingItems.value = repository.getShoppingItems()
+            _cookDoItems.value = repository.getCookDoItems()
         }
     }
 
-    fun onCookDoItemCheckedChange(item: ShoppingItem, isChecked: Boolean) {
-        _cookDoItems.value = _cookDoItems.value.map {
-            if (it == item) it.copy(isChecked = isChecked) else it
+    fun onItemCheckedChange(item: NoteItem, isChecked: Boolean) {
+        viewModelScope.launch {
+            repository.updateItem(item.copy(isChecked = isChecked))
+            _shoppingItems.value = repository.getShoppingItems()
+            _cookDoItems.value = repository.getCookDoItems()
         }
     }
 
-    fun addItem(item: ShoppingItem) {
-        _shoppingItems.value = _shoppingItems.value + item
+    fun addItem(item: NoteItem) {
+        itemCount++
+        val newItem = item.copy(name = "New Item $itemCount")
+        viewModelScope.launch {
+            repository.addItem(newItem)
+            _shoppingItems.value = repository.getShoppingItems()
+            _cookDoItems.value = repository.getCookDoItems()
+        }
     }
-
-    fun addCookDoItem(item: ShoppingItem) {
-        _cookDoItems.value = _cookDoItems.value + item
-    }
-
-    fun updateItem(oldItem: ShoppingItem, newItem: ShoppingItem) {
-        _shoppingItems.value = _shoppingItems.value.map {
-            if (it == oldItem) newItem else it
+    fun addItemWithName(nameI : String){
+        itemCount++
+        val newItem = NoteItem(name = nameI, type = NoteType.SHOPPING )
+        viewModelScope.launch {
+            repository.addItem(newItem)
+            _shoppingItems.value = repository.getShoppingItems()
+            _cookDoItems.value = repository.getCookDoItems()
         }
     }
 
-    fun updateCookDoItem(oldItem: ShoppingItem, newItem: ShoppingItem) {
-        _cookDoItems.value = _cookDoItems.value.map {
-            if (it == oldItem) newItem else it
+    fun updateItem(oldItem: NoteItem, newItem: NoteItem) {
+        viewModelScope.launch {
+            repository.updateItem(newItem)
+            _shoppingItems.value = repository.getShoppingItems()
+            _cookDoItems.value = repository.getCookDoItems()
         }
     }
 
-    fun deleteItem(item: ShoppingItem) {
-        _shoppingItems.value = _shoppingItems.value - item
-    }
-    fun deleteCookDoItem(item: ShoppingItem) {
-        _cookDoItems.value = _cookDoItems.value - item
-    }
+    fun deleteItem(item: NoteItem) {
+        viewModelScope.launch {
+            repository.deleteItem(item)
+            _shoppingItems.value = repository.getShoppingItems()
+            _cookDoItems.value = repository.getCookDoItems()
+        }
+        if(itemCount > 0) {
+            itemCount--
+        }
 
+    }
 }
 
-data class ShoppingItem(val name: String, val isChecked: Boolean = false)
+

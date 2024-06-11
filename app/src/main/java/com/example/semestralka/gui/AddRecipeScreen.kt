@@ -61,7 +61,7 @@ fun AddRecipeScreen(
                 title = { Text(if (recipeId != null) "Edit Recipe" else "Add Recipe") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
+                        Image(
                             painter = painterResource(id = R.drawable.ic_back),
                             contentDescription = "Back"
                         )

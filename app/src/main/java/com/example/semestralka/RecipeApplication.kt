@@ -1,5 +1,6 @@
 package com.example.semestralka
 
+import NoteItemRepository
 import OfflineRecipeRepository
 import android.app.Application
 import android.app.NotificationChannel
@@ -16,10 +17,11 @@ class RecipeApplication : Application() {
     private val applicationScope = CoroutineScope(SupervisorJob())
     val database by lazy { RecipeDatabase.getDatabase(this,applicationScope) }
     val repository by lazy { OfflineRecipeRepository(database.recipeDao()) }
+    val notesRepository by lazy {NoteItemRepository(database.noteItemDao())}
 
     override fun onCreate() {
         super.onCreate()
-        ViewModelFactory.init(repository,this)
+        ViewModelFactory.init(repository,this,notesRepository)
         createNotificationChannel()
     }
 
