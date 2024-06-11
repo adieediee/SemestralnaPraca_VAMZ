@@ -34,6 +34,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Checkbox
+import androidx.compose.ui.layout.ContentScale
 
 
 object NotesDestination : NavigationDestination {
@@ -46,72 +47,89 @@ fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(), onNext: () -> Un
     val shoppingItems by viewModel.shoppingItems.collectAsState()
     val cookDoItems by viewModel.cookDoItems.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Notes") }
-            )
-        },
-        bottomBar = {
-            BottomAppBar(
-                modifier = Modifier.height(60.dp),
-                containerColor = Color.Transparent
-            ) {
-                Spacer(modifier = Modifier.weight(1f))
-                Image(
-                    painter = painterResource(id = R.drawable.ic_forward),
-                    contentDescription = "Next",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .clickable(onClick = onNext)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        // Background Image
+        Image(
+            painter = painterResource(id = R.drawable.notes_bg), // Replace with your background image resource
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Notes") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent // Correct color value
+                    )
                 )
-            }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    ShoppingListCard(
-                        items = shoppingItems,
-                        onItemCheckedChange = viewModel::onItemCheckedChange,
-                        onUpdateItem = { oldItem, newItem -> viewModel.updateItem(oldItem, newItem) },
-                        onDeleteItem = { item -> viewModel.deleteItem(item) }, // Pass the delete action
-                        modifier = Modifier.weight(1f)
+            },
+            bottomBar = {
+                BottomAppBar(
+                    modifier = Modifier.height(60.dp),
+                    containerColor = Color.Transparent
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_forward),
+                        contentDescription = "Next",
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .clickable(onClick = onNext)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ElevatedButton(
-                        onClick = { viewModel.addItem(ShoppingItem("New item")) },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "Add an item")
-                    }
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    CookDoListCard(
-                        items = cookDoItems,
-                        onItemCheckedChange = viewModel::onCookDoItemCheckedChange,
-                        onUpdateItem = { oldItem, newItem -> viewModel.updateCookDoItem(oldItem, newItem) },
-                        onDeleteItem = { item -> viewModel.deleteCookDoItem(item) }, // Pass the delete action
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ElevatedButton(
-                        onClick = { viewModel.addCookDoItem(ShoppingItem("New cook do")) },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "Add a cook-do")
+            },
+            backgroundColor = Color.Transparent // Make Scaffold background transparent
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        ShoppingListCard(
+                            items = shoppingItems,
+                            onItemCheckedChange = viewModel::onItemCheckedChange,
+                            onUpdateItem = { oldItem, newItem -> viewModel.updateItem(oldItem, newItem) },
+                            onDeleteItem = { item -> viewModel.deleteItem(item) }, // Pass the delete action
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        ElevatedButton(
+                            onClick = { viewModel.addItem(ShoppingItem("New item")) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "Add an item")
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        CookDoListCard(
+                            items = cookDoItems,
+                            onItemCheckedChange = viewModel::onCookDoItemCheckedChange,
+                            onUpdateItem = { oldItem, newItem -> viewModel.updateCookDoItem(oldItem, newItem) },
+                            onDeleteItem = { item -> viewModel.deleteCookDoItem(item) }, // Pass the delete action
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        ElevatedButton(
+                            onClick = { viewModel.addCookDoItem(ShoppingItem("New cook do")) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "Add a cook-do")
+                        }
                     }
                 }
             }
@@ -131,7 +149,10 @@ fun ShoppingListCard(
     Card(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        modifier = modifier.fillMaxHeight()
+        modifier = modifier.fillMaxHeight(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFFFFF) // Correct color value
+        )
     ) {
         LazyColumn(
             modifier = Modifier.padding(16.dp)
@@ -198,7 +219,10 @@ fun CookDoListCard(
     Card(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        modifier = modifier.fillMaxHeight()
+        modifier = modifier.fillMaxHeight(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFFFFF) // Correct color value
+        )
     ) {
         LazyColumn(
             modifier = Modifier.padding(16.dp)

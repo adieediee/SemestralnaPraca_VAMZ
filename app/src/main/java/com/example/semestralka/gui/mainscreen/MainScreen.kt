@@ -4,24 +4,29 @@ import SharedViewModelMealCard
 import ShoppingItem
 import ShoppingListViewModel
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,19 +81,35 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Here’s to a delicious meal",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(R.string.here_s_to_a_delicious_meal),
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(vertical = 8.dp),
+                    lineHeight = 40.sp
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.stars), // replace with your star drawable
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(72.dp) // Adjust size as needed
+                        .offset(x = (-16).dp, y = 1.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
             Text(
                 text = "today’s meal choice",
                 fontSize = 20.sp,
                 color = Color.Gray,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 4.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
+
             MealCard(sharedViewModelMealCard)
             Spacer(modifier = Modifier.height(16.dp))
             ListsRow(viewModel)
@@ -103,60 +124,86 @@ fun MealCard(sharedViewModelMealCard: SharedViewModelMealCard) {
 
     Card(
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        //elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent, //Card background color
+
+        ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp)
+            .padding(1.dp)
+            .height(240.dp)
+            .background(Color.Transparent)
+
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+                .fillMaxSize()
+                .clip(RoundedCornerShape(16.dp))
         ) {
-            selectedRecipe?.let { recipe ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_meal), // Replace with your meal icon resource
-                        contentDescription = "Meal Icon",
-                        modifier = Modifier.size(24.dp)
+            Image(
+                painter = painterResource(id = R.drawable.gradient_background), // Your gradient background image
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(16.dp))
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                selectedRecipe?.let { recipe ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_meal), // Replace with your meal icon resource
+                            contentDescription = "Meal Icon",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = recipe.name,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    val imageRequest = ImageRequest.Builder(LocalContext.current)
+                        .data(recipe.imageUri ?: R.drawable.default_image_recipe)
+                        .crossfade(true)
+                        .placeholder(R.drawable.default_image_recipe)
+                        .error(R.drawable.default_image_recipe)
+                        .build()
+
+                    AsyncImage(
+                        model = imageRequest,
+                        contentDescription = recipe.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(16.dp))
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                } ?: run {
                     Text(
-                        text = recipe.name,
+                        text = "No recipe selected",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
-
-                val imageRequest = ImageRequest.Builder(LocalContext.current)
-                    .data(recipe.imageUri ?: R.drawable.default_image_recipe)
-                    .crossfade(true)
-                    .placeholder(R.drawable.default_image_recipe)
-                    .error(R.drawable.default_image_recipe)
-                    .build()
-
-                AsyncImage(
-                    model = imageRequest,
-                    contentDescription = recipe.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                )
-            } ?: run {
-                Text(
-                    text = "No recipe selected",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
             }
         }
     }
 }
+
+
+
 
 @Composable
 fun ListsRow(viewModel: ShoppingListViewModel) {
@@ -180,15 +227,26 @@ fun ShoppingListCard(viewModel: ShoppingListViewModel) {
         modifier = Modifier
             .padding(4.dp)
             .width(screenWidthDp)
-            .height(293.dp)
+            .height(293.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF6F6F6)
+        )
     ) {
         LazyColumn(
             modifier = Modifier.padding(10.dp)
         ) {
             item {
-                Text(
-                    text = "shopping list", fontSize = 20.sp, fontWeight = FontWeight.Bold
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_shopping), // replace with your shopping icon drawable
+                        contentDescription = "Shopping Icon",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "shopping list", fontSize = 20.sp, fontWeight = FontWeight.Bold
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = "today’s meal:")
             }
@@ -210,6 +268,7 @@ fun ShoppingListCard(viewModel: ShoppingListViewModel) {
     }
 }
 
+
 @Composable
 fun CookDoListCard(viewModel: ShoppingListViewModel) {
     val configuration = LocalConfiguration.current
@@ -222,15 +281,26 @@ fun CookDoListCard(viewModel: ShoppingListViewModel) {
         modifier = Modifier
             .width(screenWidthDp)
             .height(300.dp)
-            .padding(4.dp)
+            .padding(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF6F6F6)
+        )
     ) {
         LazyColumn(
             modifier = Modifier.padding(10.dp)
         ) {
             item {
-                Text(
-                    text = "today’s cook-dos", fontSize = 20.sp, fontWeight = FontWeight.Bold
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_cook_do), // replace with your cook-do icon drawable
+                        contentDescription = "Cook-Do Icon",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "today’s cook-dos", fontSize = 20.sp, fontWeight = FontWeight.Bold
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
             }
             items(cookDoItems) { item ->
@@ -247,6 +317,7 @@ fun CookDoListCard(viewModel: ShoppingListViewModel) {
         }
     }
 }
+
 
 
 @Composable
