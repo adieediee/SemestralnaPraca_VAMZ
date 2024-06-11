@@ -18,9 +18,18 @@ import com.example.semestralka.database.RecipeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-
+/**
+ * Zdieľaný ViewModel pre správu vybranej receptovej karty s notifikáciami.
+ *
+ * @param application Aplikácia.
+ * @param recipeRepository Repozitár pre recepty.
+ */
 class SharedViewModelMealCard(application: Application, private val recipeRepository: RecipeRepository) : AndroidViewModel(application) {
-
+    /**
+     * Vyberie recept a nastaví ho ako aktuálne vybraný, zároveň odošle notifikáciu.
+     *
+     * @param recipe Recept, ktorý má byť vybraný.
+     */
     private val _selectedRecipe = MutableStateFlow<Recipe?>(null)
     val selectedRecipe: StateFlow<Recipe?> get() = _selectedRecipe
 
@@ -29,20 +38,32 @@ class SharedViewModelMealCard(application: Application, private val recipeReposi
             _selectedRecipe.value = recipeRepository.getSelectedRecipe()
         }
     }
-
+    /**
+     * Odošle notifikáciu s daným titulkom a správou.
+     *
+     * @param context Kontext aplikácie.
+     * @param title Titulok notifikácie.
+     * @param message Správa notifikácie.
+     */
     fun selectRecipe(recipe: Recipe) {
-        Log.d("NOTIFKA","NOTIFKA")
         viewModelScope.launch {
             recipeRepository.selectRecipe(recipe)
             _selectedRecipe.value = recipe
             sendNotification(getApplication(), "Recipe Selected", "You have selected the recipe: ${recipe.name}")
         }
     }
-
+    /**
+     * Odošle notifikáciu s daným názvom a správou.
+     * Robená podľa codelabu
+     *https://developer.android.com/develop/ui/views/notifications/build-notification
+     * @param context Kontext aplikácie.
+     * @param title Názov notifikácie.
+     * @param message Správa notifikácie.
+     */
     private fun sendNotification(context: Context, title: String, message: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                Log.d("SharedViewModelMealCard", "Permission for notifications not granted")
+
                 return
             }
         }
@@ -53,7 +74,7 @@ class SharedViewModelMealCard(application: Application, private val recipeReposi
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(context, "CHANNEL_ID")
-            .setSmallIcon(R.drawable.ic_meal) // ikona notifikácie
+            .setSmallIcon(R.drawable.ic_meal)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -64,6 +85,5 @@ class SharedViewModelMealCard(application: Application, private val recipeReposi
             notify(1, builder.build())
         }
 
-        Log.d("SharedViewModelMealCard", "Notification sent")
     }
 }

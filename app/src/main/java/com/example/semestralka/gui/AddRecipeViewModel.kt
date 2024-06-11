@@ -8,7 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.semestralka.database.Recipe
 import com.example.semestralka.database.RecipeRepository
 import kotlinx.coroutines.launch
-
+/**
+ * ViewModel pre pridanie alebo úpravu receptu.
+ *
+ * @param repository Repozitár pre recepty.
+ */
 class AddRecipeViewModel(private val repository: RecipeRepository) : ViewModel() {
     var name by mutableStateOf("")
     var time by mutableStateOf("")
@@ -17,7 +21,11 @@ class AddRecipeViewModel(private val repository: RecipeRepository) : ViewModel()
     var type by mutableStateOf("")
     var method by mutableStateOf("")
     var imageUri by mutableStateOf<String?>(null)
-
+    /**
+     * Načítanie receptu podľa ID a nastavenie jeho údajov do stavov ViewModelu.
+     *
+     * @param recipeId ID receptu, ktorý má byť načítaný.
+     */
     fun loadRecipe(recipeId: Int) {
         viewModelScope.launch {
             val recipe = repository.getRecipeById(recipeId)
@@ -32,7 +40,12 @@ class AddRecipeViewModel(private val repository: RecipeRepository) : ViewModel()
             }
         }
     }
-
+    /**
+     * Uloženie receptu s aktuálnymi údajmi v ViewModeli.
+     *
+     * @param recipeId ID receptu, ak ide o úpravu existujúceho receptu, inak null.
+     * @param onComplete Lambda funkcia, ktorá sa vykoná po dokončení uloženia.
+     */
     fun saveRecipe(recipeId: Int?, onComplete: () -> Unit) {
         val recipe = Recipe(
             id = recipeId ?: 0,

@@ -11,7 +11,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
-
+/**
+ * ViewModel pre zoznam receptov s možnosťou vyhľadávania.
+ * Robené s pomocou
+ * https://amitshekhar.me/blog/instant-search-using-kotlin-flow-operators
+ * @property repository Repozitár pre recepty.
+ */
 class RecipeListViewModel(private val repository: RecipeRepository) : ViewModel() {
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText
@@ -26,7 +31,11 @@ class RecipeListViewModel(private val repository: RecipeRepository) : ViewModel(
             }
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
+    /**
+     * Reakcia na zmenu vyhľadávacieho textu.
+     *
+     * @param newText Nový vyhľadávací text.
+     */
     fun onSearchTextChanged(newText: String) {
         _searchText.value = newText
     }

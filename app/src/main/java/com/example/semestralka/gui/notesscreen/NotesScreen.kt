@@ -36,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Checkbox
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import com.example.semestralka.database.NoteItem
 import com.example.semestralka.database.NoteType
 
@@ -43,6 +44,12 @@ import com.example.semestralka.database.NoteType
 object NotesDestination : NavigationDestination {
     override val route = "notes"
 }
+/**
+ * Obrazovka pre zobrazenie poznámok.
+ *
+ * @param viewModel Inštancia ShoppingListViewModel.
+ * @param onNext Lambda funkcia na spracovanie kliknutia na tlačidlo ďalej.
+ */
 @Composable
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(factory = ViewModelFactory), onNext: () -> Unit) {
@@ -59,7 +66,7 @@ fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(factory = ViewModel
 
         Column {
             TopAppBar(
-                title = { Text("Notes") },
+                title = { Text(stringResource(R.string.notes)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     titleContentColor = Color.Black
@@ -87,11 +94,12 @@ fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(factory = ViewModel
                                 modifier = Modifier.weight(1f)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
+                            val name = stringResource(R.string.new_item);
                             ElevatedButton(
-                                onClick = { viewModel.addItem(NoteItem(name = "New Item", type = NoteType.SHOPPING)) },
+                                onClick = { viewModel.addItem(NoteItem(name = name, type = NoteType.SHOPPING)) },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(text = "Add an item")
+                                Text(text = stringResource(R.string.add_an_item))
                             }
                         }
                         Spacer(modifier = Modifier.width(16.dp))
@@ -104,11 +112,12 @@ fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(factory = ViewModel
                                 modifier = Modifier.weight(1f)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
+                            val cookDoName = stringResource(R.string.new_cook_do)
                             ElevatedButton(
-                                onClick = { viewModel.addItem(NoteItem(name = "New Cook-Do", type = NoteType.COOK_DO)) },
+                                onClick = { viewModel.addItem(NoteItem(name = cookDoName, type = NoteType.COOK_DO)) },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(text = "Add a cook-do")
+                                Text(text = stringResource(R.string.add_a_cook_do))
                             }
                         }
                     }
@@ -137,7 +146,15 @@ fun NotesScreen(viewModel: ShoppingListViewModel = viewModel(factory = ViewModel
     }
 }
 
-
+/**
+ * Karta nákupného zoznamu s možnosťou úprav.
+ *
+ * @param items Zoznam položiek poznámok.
+ * @param onItemCheckedChange Lambda funkcia pre zmenu stavu označenia položky.
+ * @param onUpdateItem Lambda funkcia pre aktualizáciu položky.
+ * @param onDeleteItem Lambda funkcia pre odstránenie položky.
+ * @param modifier Modifikátor pre úpravu vzhľadu komponenty.
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ShoppingListCard(
@@ -162,11 +179,11 @@ fun ShoppingListCard(
         ) {
             item {
                 Text(
-                    text = "Shopping List",
+                    text = stringResource(R.string.shopping_list),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = "Today's meal:", fontSize = 18.sp)
+                Text(text = stringResource(R.string.today_s_meal), fontSize = 18.sp)
                 Spacer(modifier = Modifier.height(8.dp))
             }
             items(items, key = { it.name }) { item ->
@@ -209,7 +226,15 @@ fun ShoppingListCard(
         }
     }
 }
-
+/**
+ * Karta úloh pre varenie s možnosťou úprav.
+ *
+ * @param items Zoznam položiek poznámok.
+ * @param onItemCheckedChange Lambda funkcia pre zmenu stavu označenia položky.
+ * @param onUpdateItem Lambda funkcia pre aktualizáciu položky.
+ * @param onDeleteItem Lambda funkcia pre odstránenie položky.
+ * @param modifier Modifikátor pre úpravu vzhľadu komponenty.
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CookDoListCard(
@@ -232,11 +257,11 @@ fun CookDoListCard(
         ) {
             item {
                 Text(
-                    text = "Cook Do List",
+                    text = stringResource(R.string.cook_do_list),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = "Today's cook dos:", fontSize = 18.sp)
+                Text(text = stringResource(R.string.today_s_cook_dos), fontSize = 18.sp)
                 Spacer(modifier = Modifier.height(8.dp))
             }
             items(items, key = { it.name }) { item ->
@@ -279,7 +304,15 @@ fun CookDoListCard(
         }
     }
 }
-
+/**
+ * Upravitelná položka zoznamu s checkboxom.
+ *
+ * @param text Text položky.
+ * @param checked Indikátor, či je položka označená.
+ * @param onCheckedChange Lambda funkcia pre zmenu stavu checkboxu.
+ * @param onUpdateText Lambda funkcia pre aktualizáciu textu položky.
+ * @param onDeleteItem Lambda funkcia pre odstránenie položky.
+ */
 @Composable
 fun EditableCheckboxListItem(
     text: String,
@@ -295,19 +328,19 @@ fun EditableCheckboxListItem(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text(text = "Delete Item") },
-            text = { Text(text = "Are you sure you want to delete this item?") },
+            title = { Text(text = stringResource(R.string.delete_item)) },
+            text = { Text(text = stringResource(R.string.are_you_sure_you_want_to_delete)) },
             confirmButton = {
                 TextButton(onClick = {
                     onDeleteItem()
                     showDialog = false
                 }) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -345,7 +378,7 @@ fun EditableCheckboxListItem(
                 modifier = Modifier.weight(1f)
             )
         } else {
-            androidx.compose.material3.Text(
+            Text(
                 text = text,
                 modifier = Modifier
                     .weight(1f)

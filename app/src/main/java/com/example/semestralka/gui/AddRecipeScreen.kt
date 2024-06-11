@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,7 +30,15 @@ object AddRecipeDestination : NavigationDestination {
     const val recipeIdArg = "recipeId"
 }
 
-
+/**
+ * Obrazovka na pridanie alebo úpravu receptu.
+ * Časti kódu sú prevzaté z
+ *  https://developer.android.com/develop/ui/compose/side-effects#launchedeffect
+ *  https://stackoverflow.com/questions/60608101/how-request-permissions-with-jetpack-compose
+ * @param navController Navigačný ovládač pre navigáciu medzi obrazovkami.
+ * @param recipeId ID receptu, ak ide o úpravu existujúceho receptu, inak null.
+ * @param viewModel ViewModel pre pridanie alebo úpravu receptu.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRecipeScreen(
@@ -51,14 +60,17 @@ fun AddRecipeScreen(
         uri?.let {
             context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             imageUri = it
-            viewModel.imageUri = it.toString() // Update the image URI in the ViewModel
+            viewModel.imageUri = it.toString()
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (recipeId != null) "Edit Recipe" else "Add Recipe") },
+                title = { Text(if (recipeId != null) stringResource(R.string.edit_recipe) else stringResource(
+                    R.string.add_recipe
+                )
+                ) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Image(
@@ -81,48 +93,48 @@ fun AddRecipeScreen(
             TextField(
                 value = viewModel.name,
                 onValueChange = { viewModel.name = it },
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.name)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = viewModel.time,
                 onValueChange = { viewModel.time = it },
-                label = { Text("Time") },
+                label = { Text(stringResource(R.string.time)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = viewModel.servings,
                 onValueChange = { viewModel.servings = it },
-                label = { Text("Servings") },
+                label = { Text(stringResource(R.string.servings)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = viewModel.ingredients,
                 onValueChange = { viewModel.ingredients = it },
-                label = { Text("Ingredients") },
+                label = { Text(stringResource(R.string.ingredients)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = viewModel.type,
                 onValueChange = { viewModel.type = it },
-                label = { Text("Type") },
+                label = { Text(stringResource(R.string.type)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = viewModel.method,
                 onValueChange = { viewModel.method = it },
-                label = { Text("Method") },
+                label = { Text(stringResource(R.string.method)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(onClick = { launcher.launch(arrayOf("image/*")) }) {
-                Text("Pick Image")
+                Text(stringResource(R.string.pick_image))
             }
             Spacer(modifier = Modifier.height(16.dp))
             imageUri?.let {
@@ -142,7 +154,7 @@ fun AddRecipeScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save Recipe")
+                Text(stringResource(R.string.save_recipe))
             }
         }
     }

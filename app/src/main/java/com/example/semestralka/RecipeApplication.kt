@@ -11,7 +11,11 @@ import com.example.semestralka.database.RecipeDatabase
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-
+/**
+ * Aplikácia RecipeApplication.
+ *
+ * Inicializuje databázu, repozitáre a vytvára notifikačný kanál.
+ */
 class RecipeApplication : Application() {
 
     private val applicationScope = CoroutineScope(SupervisorJob())
@@ -24,7 +28,9 @@ class RecipeApplication : Application() {
         ViewModelFactory.init(repository,this,notesRepository)
         createNotificationChannel()
     }
-
+    /**
+     * Inicializuje notifikačný kanál pre aplikáciu.
+     */
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.channel_name)

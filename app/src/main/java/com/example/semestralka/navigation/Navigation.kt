@@ -27,7 +27,12 @@ import com.example.semestralka.gui.notesscreen.NotesDestination
 import com.example.semestralka.gui.notesscreen.NotesScreen
 import com.example.semestralka.gui.notesscreen.ShoppingListViewModel
 
-
+/**
+ * Hlavná navigačná funkcia aplikácie.
+ *
+ * @param navController Navigačný ovládač pre navigáciu medzi obrazovkami.
+ * @param modifier Modifikátor pre úpravu vzhľadu komponenty.
+ */
 @Composable
 fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
     val sharedViewModel: SharedViewModel = viewModel(factory = ViewModelFactory)

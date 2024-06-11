@@ -39,7 +39,14 @@ import com.example.semestralka.navigation.NavigationDestination
 object MainDestination : NavigationDestination {
     override val route = "main"
 }
-
+/**
+ * Hlavná obrazovka aplikácie.
+ *
+ * @param onPrevious Lambda funkcia na spracovanie kliknutia na tlačidlo späť.
+ * @param onNext Lambda funkcia na spracovanie kliknutia na tlačidlo ďalej.
+ * @param viewModel Inštancia ShoppingListViewModel.
+ * @param sharedViewModelMealCard Inštancia SharedViewModelMealCard.
+ */
 @Composable
 fun MainScreen(
     onPrevious: () -> Unit,
@@ -116,7 +123,11 @@ fun MainScreen(
         }
     }
 }
-
+/**
+ * Zobrazuje kartu s vybraným jedlom.
+ *
+ * @param sharedViewModelMealCard Inštancia SharedViewModelMealCard.
+ */
 @Composable
 fun MealCard(sharedViewModelMealCard: SharedViewModelMealCard) {
     val selectedRecipe by sharedViewModelMealCard.selectedRecipe.collectAsState()
@@ -196,7 +207,11 @@ fun MealCard(sharedViewModelMealCard: SharedViewModelMealCard) {
         }
     }
 }
-
+/**
+ * Zobrazuje riadok s kartami zoznamov.
+ *
+ * @param viewModel Inštancia ShoppingListViewModel.
+ */
 @Composable
 fun ListsRow(viewModel: ShoppingListViewModel) {
     Row(
@@ -206,7 +221,11 @@ fun ListsRow(viewModel: ShoppingListViewModel) {
         CookDoListCard(viewModel)
     }
 }
-
+/**
+ * Zobrazuje kartu nákupného zoznamu.
+ *
+ * @param viewModel Inštancia ShoppingListViewModel.
+ */
 @Composable
 fun ShoppingListCard(viewModel: ShoppingListViewModel) {
     val configuration = LocalConfiguration.current
@@ -256,7 +275,11 @@ fun ShoppingListCard(viewModel: ShoppingListViewModel) {
         }
     }
 }
-
+/**
+ * Zobrazuje kartu úloh pre varenie.
+ *
+ * @param viewModel Inštancia ShoppingListViewModel.
+ */
 @Composable
 fun CookDoListCard(viewModel: ShoppingListViewModel) {
     val configuration = LocalConfiguration.current
@@ -305,7 +328,13 @@ fun CookDoListCard(viewModel: ShoppingListViewModel) {
         }
     }
 }
-
+/**
+ * Zobrazuje položku zoznamu s checkboxom.
+ *
+ * @param text Text položky.
+ * @param checked Indikátor, či je položka označená.
+ * @param onCheckedChange Lambda funkcia pre zmenu stavu checkboxu.
+ */
 @Composable
 fun CheckboxListItem(text: String, checked: Boolean = false, onCheckedChange: (Boolean) -> Unit = {}) {
     Row(
@@ -318,14 +347,24 @@ fun CheckboxListItem(text: String, checked: Boolean = false, onCheckedChange: (B
         Text(text = text)
     }
 }
-
+/**
+ * Zobrazuje tlačidlo na pridanie položky.
+ *
+ * @param text Text tlačidla.
+ * @param onClick Lambda funkcia na spracovanie kliknutia na tlačidlo.
+ */
 @Composable
 fun AddItemButton(text: String, onClick: () -> Unit = {}) {
     TextButton(onClick = onClick) {
         Text(text = text)
     }
 }
-
+/**
+ * Zobrazuje zvýšené tlačidlo príkladu.
+ *
+ * @param text Text tlačidla.
+ * @param onRecipe Lambda funkcia na spracovanie kliknutia na tlačidlo.
+ */
 @Composable
 fun ElevatedButtonExample(text: String, onRecipe: () -> Unit) {
     Button(

@@ -10,7 +10,13 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
+/**
+ * Hlavná trieda databázy pre aplikáciu.
+ * Túto časť som prebrala a upravila z codelabu
+ * https://developer.android.com/codelabs/basic-android-kotlin-compose-persisting-data-room#4
+ * @property recipeDao DAO pre recepty.
+ * @property noteItemDao DAO pre položky poznámok.
+ */
 @Database(entities = [Recipe::class, NoteItem::class], version = 9, exportSchema = false)
 abstract class RecipeDatabase : RoomDatabase() {
     abstract fun recipeDao(): RecipeDao
@@ -19,11 +25,15 @@ abstract class RecipeDatabase : RoomDatabase() {
 
         @Volatile
         private var INSTANCE: RecipeDatabase? = null
-
+        /**
+         * Získava inštanciu databázy.
+         *
+         * @param context Kontext aplikácie.
+         * @param scope Korutína pre inicializáciu databázy.
+         * @return Inštancia databázy.
+         */
         fun getDatabase(context: Context, scope: CoroutineScope): RecipeDatabase {
-            Log.d("RecipeDatabase", "getDatabase called")
             return INSTANCE ?: synchronized(this) {
-                Log.d("RecipeDatabase", "Creating new instance of database")
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     RecipeDatabase::class.java,
@@ -33,22 +43,22 @@ abstract class RecipeDatabase : RoomDatabase() {
                     .addCallback(RecipeDatabaseCallback(scope))
                     .build()
                 INSTANCE = instance
-                Log.d("RecipeDatabase", "Database instance created")
-
                 instance
             }
         }
     }
-
+    /**
+     * Callback trieda pre inicializáciu databázy.
+     *
+     * @property scope Korutína pre inicializáciu databázy.
+     */
     private class RecipeDatabaseCallback(
         private val scope: CoroutineScope
     ) : RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-            Log.d("RecipeDatabase", "Database onCreate called")
             INSTANCE?.let { database ->
                 scope.launch {
-                    Log.d("RecipeDatabase", "Launching coroutine to populate database")
                     populateDatabase(database.recipeDao())
                 }
             }
@@ -56,11 +66,14 @@ abstract class RecipeDatabase : RoomDatabase() {
 
         override fun onOpen(db: SupportSQLiteDatabase) {
             super.onOpen(db)
-            Log.d("RecipeDatabase", "Database onOpen called")
         }
-
+        /**
+         * Naplní databázu počiatočnými receptami.
+         *
+         * @param recipeDao DAO pre recepty.
+         */
         suspend fun populateDatabase(recipeDao: RecipeDao) {
-            Log.d("RecipeDatabase", "Populating database with initial recipes")
+
             // Add initial recipes
             val recipes = listOf(
                 Recipe(name = "Stuffed Peppers with cheese sauce", time = "1h 30min", servings = "4-6 servings", ingredients = "Bell peppers, cheese", type = "dinner", method = "Stuff and bake", imageUri = null),
@@ -70,15 +83,13 @@ abstract class RecipeDatabase : RoomDatabase() {
                 Recipe(name = "Homemade Lasagna", time = "2h", servings = "8 servings", ingredients = "Lasagna noodles, cheese, sauce", type = "dinner", method = "Layer and bake",imageUri = null)
             )
             recipes.forEach {
-                Log.d("RecipeDatabase", "Inserting recipe: ${it.name}")
                 recipeDao.insert(it)
-                Log.d("RecipeDatabase", "Inserted recipe: ${it.name}")
             }
-            Log.d("RecipeDatabase", "Finished populating database")
+
         }
     }
 
 }
 
-// Add this simple logging test to your MainActivity or Application class to verify logging works.
+
 

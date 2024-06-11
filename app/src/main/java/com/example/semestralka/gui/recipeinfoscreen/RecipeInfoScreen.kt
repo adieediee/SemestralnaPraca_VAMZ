@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,7 +35,16 @@ import com.example.semestralka.navigation.NavigationDestination
 object RecipeInfoDestination : NavigationDestination {
     override val route = "recipeInfo"
 }
-
+/**
+ * Obrazovka s detailmi receptu.
+ *
+ * @param onBack Lambda funkcia na spracovanie kliknutia na tlačidlo späť.
+ * @param onEdit Lambda funkcia na spracovanie kliknutia na tlačidlo upraviť.
+ * @param onDelete Lambda funkcia na spracovanie kliknutia na tlačidlo odstrániť.
+ * @param sharedViewModel Zdieľaný ViewModel pre recepty.
+ * @param sharedViewModelMealCard Zdieľaný ViewModel pre kartu jedla.
+ * @param shoppingListViewModel ViewModel pre zoznam nákupov.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeInfoScreen(
@@ -99,15 +109,15 @@ fun RecipeInfoScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(painter = painterResource(id = R.drawable.ic_time), contentDescription = "Time")
+                        Icon(painter = painterResource(id = R.drawable.ic_time), contentDescription = stringResource(R.string.time))
                         Text(text = recipe.time)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(painter = painterResource(id = R.drawable.ic_servings), contentDescription = "Servings")
+                        Icon(painter = painterResource(id = R.drawable.ic_servings), contentDescription = stringResource(R.string.servings))
                         Text(text = recipe.servings)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(painter = painterResource(id = R.drawable.ic_meal), contentDescription = "Type")
+                        Icon(painter = painterResource(id = R.drawable.ic_meal), contentDescription = stringResource(R.string.type))
                         Text(text = recipe.type)
                     }
                 }
@@ -120,20 +130,20 @@ fun RecipeInfoScreen(
                 RecipeSteps(recipe.method)
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = { sharedViewModelMealCard.selectRecipe(recipe) }) {
-                    Text("Select for Today")
+                    Text(stringResource(R.string.select_for_today))
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = { showDialog = true },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete Recipe")
+                    Text(stringResource(R.string.delete_recipe))
                 }
             }
 
             Image(
                 painter = painterResource(id = R.drawable.ic_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.back),
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(8.dp)
@@ -143,7 +153,7 @@ fun RecipeInfoScreen(
             )
             Image(
                 painter = painterResource(id = R.drawable.ic_edit),
-                contentDescription = "Edit",
+                contentDescription = stringResource(R.string.edit),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
@@ -154,26 +164,36 @@ fun RecipeInfoScreen(
         }
     }
 }
-
+/**
+ * Dialógové okno na potvrdenie odstránenia.
+ *
+ * @param onConfirm Lambda funkcia na spracovanie potvrdenia odstránenia.
+ * @param onDismiss Lambda funkcia na spracovanie zrušenia odstránenia.
+ */
 @Composable
 fun DeleteConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Delete Recipe") },
-        text = { Text(text = "Are you sure you want to delete this recipe?") },
+        title = { Text(text = stringResource(R.string.delete_r)) },
+        text = { Text(text = stringResource(R.string.are_you_sure_you_want_to_delete_this_recipe)) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Delete")
+                Text(stringResource(R.string.delete))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
 }
-
+/**
+ * Zobrazenie zoznamu ingrediencií receptu.
+ *
+ * @param ingredients Zoznam ingrediencií vo forme reťazca.
+ * @param onAddToShoppingList Lambda funkcia na pridanie ingrediencií do nákupného zoznamu.
+ */
 @Composable
 
 fun IngredientsList(ingredients: String, onAddToShoppingList: (String) -> Unit) {
@@ -184,7 +204,7 @@ fun IngredientsList(ingredients: String, onAddToShoppingList: (String) -> Unit) 
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Ingredients:",
+                text = stringResource(R.string.ingredients2),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -198,13 +218,17 @@ fun IngredientsList(ingredients: String, onAddToShoppingList: (String) -> Unit) 
                     onAddToShoppingList(ingredient)
                 }
             }) {
-                Text(text = "Add to shopping list")
+                Text(text = stringResource(R.string.add_to_shopping_list))
             }
         }
     }
 }
 
-
+/**
+ * Zobrazenie krokov receptu.
+ *
+ * @param method Kroky receptu vo forme reťazca.
+ */
 @Composable
 fun RecipeSteps(method: String) {
     val steps = method.split(". ")
@@ -220,7 +244,12 @@ fun RecipeSteps(method: String) {
         }
     }
 }
-
+/**
+ * Zobrazenie položky zoznamu s checkboxom pre recept.
+ *
+ * @param text Text položky.
+ * @param checked Indikátor, či je položka označená. Predvolená hodnota je false.
+ */
 @Composable
 fun CheckboxListItemRecipe(text: String, checked: Boolean = false) {
     Row(
@@ -229,7 +258,7 @@ fun CheckboxListItemRecipe(text: String, checked: Boolean = false) {
     ) {
         Checkbox(
             checked = checked,
-            onCheckedChange = null // This can be implemented as per requirement
+            onCheckedChange = null
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = text)
